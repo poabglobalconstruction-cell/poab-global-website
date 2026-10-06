@@ -189,3 +189,4 @@ To eliminate recurring mobile navigation scroll-lock and overlay bugs:
 - Official social media URLs (configurable via `/admin/settings`)
 - High-resolution real site photography for completed/ongoing building projects
 - Production domain DNS assignment & SSL
+Deployment triger: POAB production setup
