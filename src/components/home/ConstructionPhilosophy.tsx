@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { CONSTRUCTION_PRINCIPLES } from "@/lib/constants";
 import { CheckCircle2 } from "lucide-react";
 
@@ -27,6 +28,23 @@ export function ConstructionPhilosophy() {
 
             <div className="p-4 bg-white border-l-4 border-poab-gold border border-poab-grey-border text-xs text-poab-charcoal leading-relaxed font-medium">
               &ldquo;A building is only as reliable as the supervision protecting its foundation. Our priority is building structures that stand the test of time.&rdquo;
+            </div>
+
+            {/* Illustrative Sub-Structure Detail */}
+            <div className="border border-poab-grey-border bg-white overflow-hidden shadow-xs">
+              <div className="relative aspect-[16/10] w-full">
+                <Image
+                  src="/images/illustrative/nigeria-foundation-work.jpg"
+                  alt="Construction workers laying foundation blocks outdoors at an active building site"
+                  fill
+                  className="object-cover object-center"
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                />
+              </div>
+              <div className="px-3.5 py-2 bg-poab-stone-light border-t border-poab-grey-border text-[11px] font-mono uppercase tracking-wider text-poab-charcoal/70 flex items-center justify-between">
+                <span>Sub-Structure Standards</span>
+                <span className="text-poab-navy/60">Foundation Blockwork Setting</span>
+              </div>
             </div>
           </div>
 

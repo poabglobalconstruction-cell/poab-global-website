@@ -1,5 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Home, Building2, Hammer, Shield, CheckCircle } from "lucide-react";
 import { COMPANY_INFO } from "@/lib/constants";
@@ -184,6 +185,43 @@ export default function ServicesPage() {
                     </Link>
                   </div>
                 </div>
+
+                {/* Illustrative Process & Delivery Photography (Service 1) */}
+                {service.id === "building-construction" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div className="border border-poab-grey-border bg-white overflow-hidden shadow-xs">
+                      <div className="relative aspect-[16/10] w-full">
+                        <Image
+                          src="/images/illustrative/nigeria-construction-ramp.jpg"
+                          alt="Construction workers carrying materials along a wooden site ramp"
+                          fill
+                          className="object-cover object-center"
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                        />
+                      </div>
+                      <div className="px-3.5 py-2 bg-poab-stone-light border-t border-poab-grey-border text-[11px] font-mono uppercase tracking-wider text-poab-charcoal/70 flex items-center justify-between">
+                        <span>Active Site Execution</span>
+                        <span className="text-poab-navy/60">Access Ramp &amp; Material Movement</span>
+                      </div>
+                    </div>
+
+                    <div className="border border-poab-grey-border bg-white overflow-hidden shadow-xs">
+                      <div className="relative aspect-[16/10] w-full">
+                        <Image
+                          src="/images/illustrative/lagos-building-construction.jpg"
+                          alt="Apartment building under structural construction in Lagos"
+                          fill
+                          className="object-cover object-center"
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                        />
+                      </div>
+                      <div className="px-3.5 py-2 bg-poab-stone-light border-t border-poab-grey-border text-[11px] font-mono uppercase tracking-wider text-poab-charcoal/70 flex items-center justify-between">
+                        <span>Multi-Level Delivery</span>
+                        <span className="text-poab-navy/60">Structural Carcass Execution</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Offerings Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

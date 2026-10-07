@@ -1,5 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ShieldCheck, HardHat, CheckCircle2, ArrowRight, MapPin, Building } from "lucide-react";
 import { COMPANY_INFO, CONSTRUCTION_PRINCIPLES } from "@/lib/constants";
@@ -69,66 +70,85 @@ export default function AboutPage() {
               </p>
             </div>
 
-            {/* Quick Fact Sheet Column */}
-            <div className="lg:col-span-5 bg-poab-stone-light p-8 border border-poab-grey-border">
-              <h3 className="font-heading text-lg font-bold text-poab-navy uppercase tracking-wider border-b border-poab-grey-border pb-4 mb-6">
-                Verified Credentials
-              </h3>
+            {/* Quick Fact Sheet & Illustrative Process Column */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="bg-poab-stone-light p-8 border border-poab-grey-border">
+                <h3 className="font-heading text-lg font-bold text-poab-navy uppercase tracking-wider border-b border-poab-grey-border pb-4 mb-6">
+                  Verified Credentials
+                </h3>
 
-              <div className="space-y-4 text-xs sm:text-sm">
-                <div>
-                  <span className="block text-[11px] uppercase tracking-wider text-poab-charcoal/60 font-medium">
-                    Corporate Entity
-                  </span>
-                  <span className="font-bold text-poab-navy">{COMPANY_INFO.name}</span>
-                </div>
+                <div className="space-y-4 text-xs sm:text-sm">
+                  <div>
+                    <span className="block text-[11px] uppercase tracking-wider text-poab-charcoal/60 font-medium">
+                      Corporate Entity
+                    </span>
+                    <span className="font-bold text-poab-navy">{COMPANY_INFO.name}</span>
+                  </div>
 
-                <div>
-                  <span className="block text-[11px] uppercase tracking-wider text-poab-charcoal/60 font-medium">
-                    CAC Registration
-                  </span>
-                  <span className="font-mono font-bold text-poab-navy">{COMPANY_INFO.rcNumber}</span>
-                </div>
+                  <div>
+                    <span className="block text-[11px] uppercase tracking-wider text-poab-charcoal/60 font-medium">
+                      CAC Registration
+                    </span>
+                    <span className="font-mono font-bold text-poab-navy">{COMPANY_INFO.rcNumber}</span>
+                  </div>
 
-                <div>
-                  <span className="block text-[11px] uppercase tracking-wider text-poab-charcoal/60 font-medium">
-                    Site Experience
-                  </span>
-                  <span className="font-semibold text-poab-navy">{COMPANY_INFO.experienceStatement}</span>
-                </div>
+                  <div>
+                    <span className="block text-[11px] uppercase tracking-wider text-poab-charcoal/60 font-medium">
+                      Site Experience
+                    </span>
+                    <span className="font-semibold text-poab-navy">{COMPANY_INFO.experienceStatement}</span>
+                  </div>
 
-                <div>
-                  <span className="block text-[11px] uppercase tracking-wider text-poab-charcoal/60 font-medium">
-                    Head Office
-                  </span>
-                  <div className="flex items-center space-x-1.5 mt-0.5">
-                    <MapPin className="w-4 h-4 text-poab-gold flex-shrink-0" />
-                    <span className="font-medium text-poab-charcoal">{COMPANY_INFO.headOffice}</span>
+                  <div>
+                    <span className="block text-[11px] uppercase tracking-wider text-poab-charcoal/60 font-medium">
+                      Head Office
+                    </span>
+                    <div className="flex items-center space-x-1.5 mt-0.5">
+                      <MapPin className="w-4 h-4 text-poab-gold flex-shrink-0" />
+                      <span className="font-medium text-poab-charcoal">{COMPANY_INFO.headOffice}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="block text-[11px] uppercase tracking-wider text-poab-charcoal/60 font-medium">
+                      Operating Range
+                    </span>
+                    <span className="font-medium text-poab-charcoal">{COMPANY_INFO.operationsCoverage}</span>
+                  </div>
+
+                  <div>
+                    <span className="block text-[11px] uppercase tracking-wider text-poab-charcoal/60 font-medium">
+                      Business Model
+                    </span>
+                    <span className="font-medium text-poab-charcoal">{COMPANY_INFO.positioning}</span>
                   </div>
                 </div>
 
-                <div>
-                  <span className="block text-[11px] uppercase tracking-wider text-poab-charcoal/60 font-medium">
-                    Operating Range
-                  </span>
-                  <span className="font-medium text-poab-charcoal">{COMPANY_INFO.operationsCoverage}</span>
-                </div>
-
-                <div>
-                  <span className="block text-[11px] uppercase tracking-wider text-poab-charcoal/60 font-medium">
-                    Business Model
-                  </span>
-                  <span className="font-medium text-poab-charcoal">{COMPANY_INFO.positioning}</span>
+                <div className="mt-8 pt-6 border-t border-poab-grey-border">
+                  <Link
+                    href="/request-quote"
+                    className="w-full py-3 bg-poab-navy text-white text-xs uppercase tracking-wider font-semibold text-center block hover:bg-poab-navy-surface transition-colors"
+                  >
+                    Request a Quote
+                  </Link>
                 </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-poab-grey-border">
-                <Link
-                  href="/request-quote"
-                  className="w-full py-3 bg-poab-navy text-white text-xs uppercase tracking-wider font-semibold text-center block hover:bg-poab-navy-surface transition-colors"
-                >
-                  Request a Quote
-                </Link>
+              {/* Illustrative Process Photography */}
+              <div className="border border-poab-grey-border bg-white overflow-hidden shadow-xs">
+                <div className="relative aspect-[4/3] w-full">
+                  <Image
+                    src="/images/illustrative/kaduna-active-construction.jpg"
+                    alt="Construction workers on site handling structural masonry and blockwork"
+                    fill
+                    className="object-cover object-center"
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                  />
+                </div>
+                <div className="px-4 py-2.5 bg-poab-stone-light border-t border-poab-grey-border text-[11px] font-mono uppercase tracking-wider text-poab-charcoal/70 flex items-center justify-between">
+                  <span>Site Engineering</span>
+                  <span className="text-poab-navy/60">Active Structural Masonry</span>
+                </div>
               </div>
             </div>
           </div>
