@@ -3,6 +3,7 @@ import { sellPropertySubmissionSchema } from "@/lib/validation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { getNextReference } from "@/lib/reference";
+import { sendSellPropertyNotification } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -130,6 +131,29 @@ export async function POST(req: NextRequest) {
           });
         }
       }
+    }
+
+    // 6. Non-blocking Email Notification (Resend)
+    // Supabase persistence is already complete; failure to send email must never fail the submission.
+    try {
+      await sendSellPropertyNotification({
+        requestId,
+        reference,
+        seller_name: data.seller_name,
+        phone: data.phone,
+        email: data.email,
+        whatsapp: data.whatsapp,
+        property_location: data.property_location,
+        property_type: data.property_type,
+        expected_price: data.expected_price,
+        description: data.description,
+        filesCount: files?.filter((f) => f && f.size > 0).length || 0,
+      });
+    } catch (emailErr) {
+      console.error(
+        "[WARNING] Sell property notification email delivery failed:",
+        emailErr instanceof Error ? emailErr.message : "Unknown error"
+      );
     }
 
     return NextResponse.json({

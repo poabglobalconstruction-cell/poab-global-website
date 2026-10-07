@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { contactFormSchema } from "@/lib/validation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { sendContactNotification } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -53,6 +54,23 @@ export async function POST(req: NextRequest) {
           { status: 500 }
         );
       }
+    }
+
+    // Non-blocking Email Notification (Resend)
+    // Supabase persistence is already complete; failure to send email must never fail the submission.
+    try {
+      await sendContactNotification({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        subject: data.subject,
+        message: data.message,
+      });
+    } catch (emailErr) {
+      console.error(
+        "[WARNING] Contact notification email delivery failed:",
+        emailErr instanceof Error ? emailErr.message : "Unknown error"
+      );
     }
 
     return NextResponse.json({

@@ -3,6 +3,7 @@ import { quoteSubmissionSchema } from "@/lib/validation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { getNextReference } from "@/lib/reference";
+import { sendQuoteNotification } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -157,6 +158,37 @@ export async function POST(req: NextRequest) {
           });
         }
       }
+    }
+
+    // 6. Non-blocking Email Notification (Resend)
+    // Supabase persistence is already complete; failure to send email must never fail the submission.
+    try {
+      await sendQuoteNotification({
+        quoteId,
+        reference,
+        name: data.name,
+        phone: data.phone,
+        email: data.email,
+        whatsapp: data.whatsapp,
+        preferred_contact: data.preferred_contact,
+        project_type: data.project_type,
+        location: data.location,
+        land_size: data.land_size,
+        floors: data.floors,
+        bedrooms: data.bedrooms,
+        current_stage: data.current_stage,
+        budget_range: data.budget_range,
+        timeline: data.timeline,
+        has_building_plan: data.has_building_plan,
+        description: data.description,
+        project_inspiration: data.project_inspiration,
+        filesCount: files?.filter((f) => f && f.size > 0).length || 0,
+      });
+    } catch (emailErr) {
+      console.error(
+        "[WARNING] Quote notification email delivery failed:",
+        emailErr instanceof Error ? emailErr.message : "Unknown error"
+      );
     }
 
     return NextResponse.json({

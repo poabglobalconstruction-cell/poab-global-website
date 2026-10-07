@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { propertyEnquirySchema } from "@/lib/validation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { sendPropertyEnquiryNotification } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -57,6 +58,45 @@ export async function POST(req: NextRequest) {
           { status: 500 }
         );
       }
+    }
+
+    // 3. Fetch property context for the notification email (if available)
+    let propertyTitle: string | undefined;
+    let propertyReference: string | undefined;
+    if (supabase && data.property_id) {
+      try {
+        const { data: prop } = await supabase
+          .from("properties")
+          .select("title, reference")
+          .eq("id", data.property_id)
+          .maybeSingle();
+        if (prop) {
+          propertyTitle = prop.title;
+          propertyReference = prop.reference;
+        }
+      } catch {
+        // Safe: non-blocking query
+      }
+    }
+
+    // 4. Non-blocking Email Notification (Resend)
+    // Supabase persistence is already complete; failure to send email must never fail the submission.
+    try {
+      await sendPropertyEnquiryNotification({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        whatsapp: data.whatsapp,
+        message: data.message,
+        propertyTitle,
+        propertyReference,
+        propertyId: data.property_id,
+      });
+    } catch (emailErr) {
+      console.error(
+        "[WARNING] Property enquiry notification email delivery failed:",
+        emailErr instanceof Error ? emailErr.message : "Unknown error"
+      );
     }
 
     return NextResponse.json({
