@@ -2,9 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { verifyAdminSession } from "@/lib/supabase/auth";
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await verifyAdminSession();
+    if (!session || !["admin", "super_admin"].includes(session.role)) {
+      return NextResponse.json(
+        { error: "Unauthorized: Active administrator privileges required" },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
     const supabase = await createServerSupabaseClient();
     const admin = createAdminSupabaseClient();
@@ -57,6 +66,14 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const session = await verifyAdminSession();
+    if (!session || !["admin", "super_admin"].includes(session.role)) {
+      return NextResponse.json(
+        { error: "Unauthorized: Active administrator privileges required" },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
     const { id, stages, ...updates } = body;
 
@@ -123,6 +140,14 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const session = await verifyAdminSession();
+    if (!session || !["admin", "super_admin"].includes(session.role)) {
+      return NextResponse.json(
+        { error: "Unauthorized: Active administrator privileges required" },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -138,30 +163,70 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Database client unavailable" }, { status: 500 });
     }
 
-    // Soft archive rather than destructive delete (Section 63)
-    const { data: archivedProject, error } = await client
+    // 1. Verify project existence and retrieve assets
+    const { data: project, error: fetchErr } = await client
       .from("projects")
-      .update({
-        archived_at: new Date().toISOString(),
-        published: false,
-      })
+      .select("id, title, slug, cover_image_path")
       .eq("id", id)
-      .select("slug")
       .single();
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+    if (fetchErr || !project) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
+    // 2. Identify all storage images owned by this project
+    const { data: imageRows } = await client
+      .from("project_images")
+      .select("storage_path")
+      .eq("project_id", id);
+
+    const storagePaths: string[] = [];
+    if (project.cover_image_path) {
+      storagePaths.push(project.cover_image_path);
+    }
+    if (imageRows && imageRows.length > 0) {
+      imageRows.forEach((r) => {
+        if (r.storage_path && !storagePaths.includes(r.storage_path)) {
+          storagePaths.push(r.storage_path);
+        }
+      });
+    }
+
+    // 3. Remove files from Supabase Storage bucket
+    if (storagePaths.length > 0) {
+      try {
+        const { error: storageErr } = await client.storage
+          .from("project-images")
+          .remove(storagePaths);
+        if (storageErr) {
+          console.warn("Storage deletion warning for project:", storageErr.message);
+        }
+      } catch (storageCatch) {
+        console.warn("Storage deletion error for project:", storageCatch);
+      }
+    }
+
+    // 4. Permanently delete project record (cascades to project_stages and project_images)
+    const { error: deleteErr } = await client
+      .from("projects")
+      .delete()
+      .eq("id", id);
+
+    if (deleteErr) {
+      return NextResponse.json({ error: deleteErr.message }, { status: 400 });
+    }
+
+    // 5. Revalidate public cache
     revalidatePath("/");
     revalidatePath("/projects");
-    if (archivedProject?.slug) {
-      revalidatePath(`/projects/${archivedProject.slug}`);
+    revalidatePath("/sitemap.xml");
+    if (project.slug) {
+      revalidatePath(`/projects/${project.slug}`);
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, deletedId: id });
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : "Error archiving project";
+    const msg = err instanceof Error ? err.message : "Error deleting project";
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

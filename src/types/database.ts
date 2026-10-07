@@ -136,7 +136,9 @@ export interface QuoteRequest {
 
 export interface PropertyEnquiry {
   id: string;
-  property_id: string;
+  property_id: string | null;
+  property_reference?: string | null;
+  property_title?: string | null;
   name: string;
   phone: string;
   email: string;

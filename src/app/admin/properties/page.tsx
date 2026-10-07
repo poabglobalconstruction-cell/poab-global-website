@@ -27,11 +27,23 @@ async function getAdminProperties(): Promise<Property[]> {
   }
 }
 
-export default async function AdminPropertiesPage() {
+interface AdminPropertiesPageProps {
+  searchParams?: Promise<{ deleted?: string }>;
+}
+
+export default async function AdminPropertiesPage({ searchParams }: AdminPropertiesPageProps) {
+  const resolvedParams = searchParams ? await searchParams : {};
+  const isDeleted = Boolean(resolvedParams.deleted);
   const properties = await getAdminProperties();
 
   return (
     <div className="space-y-6">
+      {isDeleted && (
+        <div className="p-4 bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center space-x-2">
+          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+          <span>Property deleted successfully.</span>
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 border border-poab-grey-border">
         <div>
           <h2 className="font-heading text-lg font-bold text-poab-navy uppercase tracking-wider">

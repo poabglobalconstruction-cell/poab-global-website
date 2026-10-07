@@ -3,10 +3,11 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, Archive, Plus, Trash2, CheckCircle2, AlertCircle, Layers } from "lucide-react";
+import { ArrowLeft, Save, Archive, Plus, Trash2, CheckCircle2, AlertCircle, AlertTriangle, Layers } from "lucide-react";
 import { Project, ProjectStage } from "@/types/database";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { DeleteConfirmationModal } from "@/components/admin/DeleteConfirmationModal";
 
 interface EditProjectClientProps {
   initialProject: Project;
@@ -22,6 +23,11 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
   const [newStageTitle, setNewStageTitle] = useState("");
   const [newStageDesc, setNewStageDesc] = useState("");
   const [newStageDate, setNewStageDate] = useState("");
+
+  // Deletion modal state
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -66,8 +72,14 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
     setIsLoading(true);
 
     try {
-      const res = await fetch(`/api/admin/projects?id=${project.id}`, {
-        method: "DELETE",
+      const res = await fetch("/api/admin/projects", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: project.id,
+          archived_at: new Date().toISOString(),
+          published: false,
+        }),
       });
       if (!res.ok) throw new Error("Failed to archive");
       setProject((prev) => ({ ...prev, archived_at: new Date().toISOString(), published: false }));
@@ -96,6 +108,28 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
       setErrorMessage(err instanceof Error ? err.message : "Failed to unarchive project");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handlePermanentDelete = async () => {
+    setIsDeleting(true);
+    setDeleteErrorMessage(null);
+
+    try {
+      const res = await fetch(`/api/admin/projects?id=${project.id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to delete project");
+      }
+
+      setIsDeleteModalOpen(false);
+      router.push("/admin/projects?deleted=project");
+    } catch (err: unknown) {
+      setDeleteErrorMessage(err instanceof Error ? err.message : "Error deleting project");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -407,6 +441,45 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
           </Button>
         </div>
       </div>
+
+      {/* Danger Zone */}
+      <div className="bg-red-50/40 border border-red-200 p-6 sm:p-8 space-y-4">
+        <div className="flex items-center space-x-2 text-red-800">
+          <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+          <h3 className="font-heading text-sm font-bold uppercase tracking-wider">
+            Danger Zone
+          </h3>
+        </div>
+        <p className="text-xs text-poab-charcoal/80 font-light leading-relaxed max-w-2xl">
+          Permanently delete this project record, construction stages, and uploaded site images from the database and storage. This cannot be undone. To retain business records without public display, use <strong>Archive Project</strong> above instead.
+        </p>
+        <div className="pt-2">
+          <Button
+            type="button"
+            variant="danger"
+            size="sm"
+            onClick={() => {
+              setDeleteErrorMessage(null);
+              setIsDeleteModalOpen(true);
+            }}
+            className="text-xs uppercase tracking-wider"
+          >
+            <Trash2 className="w-4 h-4 mr-1.5" />
+            <span>Delete Project</span>
+          </Button>
+        </div>
+      </div>
+
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        title="Delete Project?"
+        itemName={project.title}
+        itemType="Project"
+        isDeleting={isDeleting}
+        errorMessage={deleteErrorMessage}
+        onConfirm={handlePermanentDelete}
+        onClose={() => setIsDeleteModalOpen(false)}
+      />
     </div>
   );
 }

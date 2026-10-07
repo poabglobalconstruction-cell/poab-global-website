@@ -3,10 +3,11 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, Archive, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowLeft, Save, Archive, Trash2, CheckCircle2, AlertCircle, AlertTriangle } from "lucide-react";
 import { Property, PropertyImage } from "@/types/database";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { DeleteConfirmationModal } from "@/components/admin/DeleteConfirmationModal";
 
 interface EditPropertyClientProps {
   initialProperty: Property;
@@ -23,6 +24,11 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Deletion modal state
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(null);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +53,9 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to update property");
 
+      if (property.published) {
+        setProperty((prev) => ({ ...prev, archived_at: null }));
+      }
       setStatusMessage("Property details updated successfully.");
       router.refresh();
     } catch (err: unknown) {
@@ -57,18 +66,71 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
   };
 
   const handleArchive = async () => {
-    if (!confirm("Are you sure you want to archive this property?")) return;
+    if (!confirm("Are you sure you want to archive this property? It will be removed from public display.")) return;
     setIsLoading(true);
+
+    try {
+      const res = await fetch("/api/admin/properties", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: property.id,
+          archived_at: new Date().toISOString(),
+          published: false,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to archive");
+      setProperty((prev) => ({ ...prev, archived_at: new Date().toISOString(), published: false }));
+      setStatusMessage("Property has been moved to archive.");
+      router.refresh();
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : "Error archiving");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUnarchive = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/admin/properties", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: property.id,
+          archived_at: null,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to restore property");
+      setProperty((prev) => ({ ...prev, archived_at: null }));
+      setStatusMessage("Property restored from archive.");
+      router.refresh();
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : "Error restoring property");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handlePermanentDelete = async () => {
+    setIsDeleting(true);
+    setDeleteErrorMessage(null);
 
     try {
       const res = await fetch(`/api/admin/properties?id=${property.id}`, {
         method: "DELETE",
       });
-      if (!res.ok) throw new Error("Failed to archive");
-      router.push("/admin/properties");
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to delete property");
+      }
+
+      setIsDeleteModalOpen(false);
+      router.push("/admin/properties?deleted=property");
     } catch (err: unknown) {
-      setErrorMessage(err instanceof Error ? err.message : "Error archiving");
-      setIsLoading(false);
+      setDeleteErrorMessage(err instanceof Error ? err.message : "Error deleting property");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -94,7 +156,21 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
         </div>
 
         <div className="flex items-center space-x-3">
-          {property.published && (
+          {property.archived_at ? (
+            <span className="px-2.5 py-1 bg-red-100 text-red-800 text-[10px] font-bold uppercase tracking-wider border border-red-200">
+              Archived
+            </span>
+          ) : property.published ? (
+            <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase tracking-wider border border-emerald-200">
+              Published
+            </span>
+          ) : (
+            <span className="px-2.5 py-1 bg-amber-100 text-amber-800 text-[10px] font-bold uppercase tracking-wider border border-amber-200">
+              Draft
+            </span>
+          )}
+
+          {property.published && !property.archived_at && (
             <Link
               href={`/properties/${property.slug}`}
               target="_blank"
@@ -103,13 +179,24 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
               ↗ View Live
             </Link>
           )}
-          <button
-            type="button"
-            onClick={handleArchive}
-            className="px-3 py-2 text-red-700 hover:text-red-900 border border-red-200 text-xs uppercase tracking-wider font-semibold"
-          >
-            Archive Property
-          </button>
+
+          {property.archived_at ? (
+            <button
+              type="button"
+              onClick={handleUnarchive}
+              className="px-3 py-2 text-emerald-800 hover:text-emerald-950 bg-emerald-50 border border-emerald-300 text-xs uppercase tracking-wider font-semibold"
+            >
+              Restore / Unarchive
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleArchive}
+              className="px-3 py-2 text-red-700 hover:text-red-900 border border-red-200 text-xs uppercase tracking-wider font-semibold"
+            >
+              Archive Property
+            </button>
+          )}
         </div>
       </div>
 
@@ -267,6 +354,45 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
           </Button>
         </div>
       </form>
+
+      {/* Danger Zone */}
+      <div className="bg-red-50/40 border border-red-200 p-6 sm:p-8 space-y-4">
+        <div className="flex items-center space-x-2 text-red-800">
+          <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+          <h3 className="font-heading text-sm font-bold uppercase tracking-wider">
+            Danger Zone
+          </h3>
+        </div>
+        <p className="text-xs text-poab-charcoal/80 font-light leading-relaxed max-w-2xl">
+          Permanently delete this property listing and its uploaded property images from the database and storage. This cannot be undone. To retain historical listing and sales records without public display, use <strong>Archive Property</strong> above instead.
+        </p>
+        <div className="pt-2">
+          <Button
+            type="button"
+            variant="danger"
+            size="sm"
+            onClick={() => {
+              setDeleteErrorMessage(null);
+              setIsDeleteModalOpen(true);
+            }}
+            className="text-xs uppercase tracking-wider"
+          >
+            <Trash2 className="w-4 h-4 mr-1.5" />
+            <span>Delete Property</span>
+          </Button>
+        </div>
+      </div>
+
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        title="Delete Property?"
+        itemName={`${property.title} (${property.reference})`}
+        itemType="Property"
+        isDeleting={isDeleting}
+        errorMessage={deleteErrorMessage}
+        onConfirm={handlePermanentDelete}
+        onClose={() => setIsDeleteModalOpen(false)}
+      />
     </div>
   );
 }

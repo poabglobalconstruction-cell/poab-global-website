@@ -3,9 +3,18 @@ import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { getNextReference } from "@/lib/reference";
+import { verifyAdminSession } from "@/lib/supabase/auth";
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await verifyAdminSession();
+    if (!session || !["admin", "super_admin"].includes(session.role)) {
+      return NextResponse.json(
+        { error: "Unauthorized: Active administrator privileges required" },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
     const supabase = await createServerSupabaseClient();
     const admin = createAdminSupabaseClient();
@@ -62,6 +71,14 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const session = await verifyAdminSession();
+    if (!session || !["admin", "super_admin"].includes(session.role)) {
+      return NextResponse.json(
+        { error: "Unauthorized: Active administrator privileges required" },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
     const { id, ...updates } = body;
 
@@ -112,6 +129,14 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const session = await verifyAdminSession();
+    if (!session || !["admin", "super_admin"].includes(session.role)) {
+      return NextResponse.json(
+        { error: "Unauthorized: Active administrator privileges required" },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -127,30 +152,101 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Database client unavailable" }, { status: 500 });
     }
 
-    // Soft archive (Section 63)
-    const { data: archivedProperty, error } = await client
+    // 1. Verify property existence and retrieve identity data
+    const { data: propRow, error: fetchErr } = await client
       .from("properties")
-      .update({
-        archived_at: new Date().toISOString(),
-        published: false,
-      })
+      .select("id, title, reference, slug")
       .eq("id", id)
-      .select("slug")
       .single();
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+    if (fetchErr || !propRow) {
+      return NextResponse.json({ error: "Property not found" }, { status: 404 });
     }
 
+    // 2. Protect customer property enquiries: check for linked leads
+    const { data: linkedEnquiries, error: enqErr } = await client
+      .from("property_enquiries")
+      .select("id, internal_notes")
+      .eq("property_id", id);
+
+    if (enqErr) {
+      return NextResponse.json({ error: enqErr.message }, { status: 400 });
+    }
+
+    if (linkedEnquiries && linkedEnquiries.length > 0) {
+      // Attempt safe decoupling so customer leads are NOT destroyed
+      const unlinkRes = await client
+        .from("property_enquiries")
+        .update({
+          property_id: null,
+          property_reference: propRow.reference,
+          property_title: propRow.title,
+        })
+        .eq("property_id", id);
+
+      if (unlinkRes.error) {
+        // If DB schema constraint still enforces NOT NULL, DO NOT proceed with destructive cascade!
+        // Return 409 Conflict with helpful guidance to protect customer lead history.
+        return NextResponse.json(
+          {
+            error: `Cannot delete property: This listing is associated with ${linkedEnquiries.length} customer enquiry lead(s). To preserve customer history, please Archive this property instead, or apply database migration 20261007000001_safe_property_deletion.sql to decouple enquiries.`,
+            enquiriesCount: linkedEnquiries.length,
+          },
+          { status: 409 }
+        );
+      }
+    }
+
+    // 3. Identify all storage images owned by this property
+    const { data: imageRows } = await client
+      .from("property_images")
+      .select("storage_path")
+      .eq("property_id", id);
+
+    const storagePaths: string[] = [];
+    if (imageRows && imageRows.length > 0) {
+      imageRows.forEach((r) => {
+        if (r.storage_path && !storagePaths.includes(r.storage_path)) {
+          storagePaths.push(r.storage_path);
+        }
+      });
+    }
+
+    // 4. Remove files from Supabase Storage bucket
+    if (storagePaths.length > 0) {
+      try {
+        const { error: storageErr } = await client.storage
+          .from("property-images")
+          .remove(storagePaths);
+        if (storageErr) {
+          console.warn("Storage deletion warning for property:", storageErr.message);
+        }
+      } catch (storageCatch) {
+        console.warn("Storage deletion error for property:", storageCatch);
+      }
+    }
+
+    // 5. Permanently delete property record from database
+    const { error: deleteErr } = await client
+      .from("properties")
+      .delete()
+      .eq("id", id);
+
+    if (deleteErr) {
+      return NextResponse.json({ error: deleteErr.message }, { status: 400 });
+    }
+
+    // 6. Revalidate public cache
     revalidatePath("/");
     revalidatePath("/properties");
-    if (archivedProperty?.slug) {
-      revalidatePath(`/properties/${archivedProperty.slug}`);
+    revalidatePath("/sitemap.xml");
+    if (propRow.slug) {
+      revalidatePath(`/properties/${propRow.slug}`);
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, deletedId: id });
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : "Error archiving property";
+    const msg = err instanceof Error ? err.message : "Error deleting property";
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

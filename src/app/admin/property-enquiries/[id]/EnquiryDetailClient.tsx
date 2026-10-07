@@ -163,19 +163,21 @@ export function EnquiryDetailClient({ enquiry }: { enquiry: PropertyEnquiry }) {
               </div>
             </div>
           ) : (
-            <div className="bg-poab-stone-light p-6 border border-poab-grey-border space-y-2 text-xs">
-              <span className="font-mono text-poab-charcoal/60 uppercase block">
-                Target Property Reference
-              </span>
-              <p className="text-poab-charcoal/80">
-                Property ID: <span className="font-mono">{enquiry.property_id}</span>
+            <div className="bg-poab-stone-light p-6 border border-poab-grey-border space-y-3 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-poab-charcoal/70 font-bold uppercase tracking-wider">
+                  Target Property • {enquiry.property_reference ? `REF: ${enquiry.property_reference}` : "Deleted Listing"}
+                </span>
+                <span className="px-2 py-0.5 bg-red-100 text-red-800 font-semibold uppercase text-[10px] tracking-wider border border-red-200">
+                  Listing Deleted
+                </span>
+              </div>
+              <h3 className="font-heading font-bold text-base text-poab-navy">
+                {enquiry.property_title || "Preserved Property Listing"}
+              </h3>
+              <p className="text-poab-charcoal/70 text-xs leading-relaxed pt-1 border-t border-poab-grey-border">
+                The original property listing associated with this enquiry has been permanently deleted. Lead contact details and enquiry snapshot data are preserved.
               </p>
-              <Link
-                href={`/admin/properties/${enquiry.property_id}`}
-                className="text-xs text-poab-navy font-semibold hover:text-poab-gold inline-block pt-1"
-              >
-                ✎ Open Property in Admin
-              </Link>
             </div>
           )}
 

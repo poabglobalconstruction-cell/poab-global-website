@@ -72,8 +72,29 @@ export default async function AdminPropertyEnquiriesPage() {
                             </span>
                             <span>{linkedProp.title}</span>
                           </div>
+                        ) : enq.property_title || enq.property_reference ? (
+                          <div>
+                            <div className="flex items-center space-x-1.5 mb-0.5">
+                              {enq.property_reference && (
+                                <span className="font-mono text-[10px] text-poab-charcoal/70 font-bold">
+                                  {enq.property_reference}
+                                </span>
+                              )}
+                              <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-red-100 text-red-800">
+                                Listing Deleted
+                              </span>
+                            </div>
+                            <span className="text-poab-navy/90 block">
+                              {enq.property_title || "Preserved Listing"}
+                            </span>
+                          </div>
                         ) : (
-                          <span className="text-poab-charcoal/50">Property Ref</span>
+                          <div>
+                            <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-poab-stone text-poab-charcoal/70 block w-fit mb-0.5">
+                              Listing Deleted
+                            </span>
+                            <span className="text-poab-charcoal/50">Unspecified Listing</span>
+                          </div>
                         )}
                       </td>
                       <td className="p-4 text-poab-charcoal font-mono">
