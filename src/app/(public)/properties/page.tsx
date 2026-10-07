@@ -8,7 +8,7 @@ import { PropertyCard } from "@/components/properties/PropertyCard";
 
 export const metadata: Metadata = {
   title: "Properties & Land",
-  description: "Browse verified residential properties, land parcels, and commercial developments represented by POAB Global Construction Company Ltd.",
+  description: "Browse residential properties, land parcels, and commercial developments represented by POAB Global Construction Company Ltd.",
 };
 
 export const revalidate = 60;
@@ -65,7 +65,7 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
               Properties &amp; Land Opportunities
             </h1>
             <p className="text-base sm:text-lg text-poab-stone/85 font-light leading-relaxed">
-              POAB Global facilitates property sales and acquisitions with careful document review and site assessment. We connect serious clients with vetted properties in prime locations.
+              POAB also assists clients with property buying and selling opportunities. Property information is reviewed before publication, with further verification carried out according to the requirements of each transaction.
             </p>
           </div>
         </div>
@@ -77,13 +77,13 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
         <div className="bg-poab-stone-light border border-poab-grey-border p-6 sm:p-8 mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1">
             <span className="text-xs font-bold uppercase tracking-wider text-poab-gold">
-              Own Property In Nigeria?
+              Own Property in Nigeria?
             </span>
             <h2 className="font-heading text-lg sm:text-xl font-bold text-poab-navy">
-              Sell Your Land Or Building Directly Through POAB
+              Sell Your Land or Building Directly Through POAB
             </h2>
             <p className="text-xs sm:text-sm text-poab-charcoal/80 font-light max-w-2xl">
-              We vet genuine sellers, protect against distress undervaluation, and market properties securely without unsolicited public leaks.
+              We assist genuine property owners in presenting their parcels and completed buildings to prospective buyers with clear documentation and professional discretion.
             </p>
           </div>
           <Link
@@ -111,20 +111,20 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
               No Properties Currently Listed
             </h2>
             <p className="mt-2 text-xs sm:text-sm text-poab-charcoal/70 font-light leading-relaxed">
-              We do not have any public property listings available at the moment. You can contact POAB about your property requirements or submit a property for consideration.
+              New property opportunities will appear here when they are available.
             </p>
             <div className="mt-8 flex justify-center space-x-4">
               <Link
                 href="/sell-property"
                 className="px-5 py-2.5 bg-poab-navy text-white text-xs uppercase tracking-wider font-semibold hover:bg-poab-navy-surface transition-colors"
               >
-                Submit Property For Sale
+                Sell With POAB
               </Link>
               <Link
                 href="/contact"
                 className="px-5 py-2.5 bg-white border border-poab-grey-border text-xs uppercase tracking-wider font-semibold text-poab-navy hover:bg-poab-stone transition-colors"
               >
-                Inquire Directly
+                Contact POAB
               </Link>
             </div>
           </div>

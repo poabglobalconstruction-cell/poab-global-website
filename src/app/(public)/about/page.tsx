@@ -21,7 +21,7 @@ export default function AboutPage() {
               <span>Incorporated in Nigeria • {COMPANY_INFO.rcNumber}</span>
             </div>
             <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-6">
-              Construction Built on Site Proof &amp; Professional Rigor.
+              Construction Built on Site Proof &amp; Professional Rigour.
             </h1>
             <p className="text-base sm:text-lg text-poab-stone/85 font-light leading-relaxed">
               POAB Global Construction Company Ltd is a registered Nigerian building contractor dedicated to delivering residential and commercial structures from virgin excavation through to final keys handover.
@@ -39,7 +39,7 @@ export default function AboutPage() {
                 Company Profile
               </div>
               <h2 className="font-heading text-2xl sm:text-3xl font-bold text-poab-navy tracking-tight">
-                Practical Experience Where It Matters: On The Ground.
+                Practical Experience Where It Matters: On the Ground.
               </h2>
               <p>
                 At POAB Global Construction Company Ltd, our foundation is built on <strong>11 years of hands-on site engineering experience</strong>. While many contractors supervise projects through third parties or desk estimates, our leadership was shaped directly in the trenches—overseeing excavation depths, testing concrete mixes, and ensuring structural blockwork aligns perfectly.
@@ -124,7 +124,7 @@ export default function AboutPage() {
                   href="/request-quote"
                   className="w-full py-3 bg-poab-navy text-white text-xs uppercase tracking-wider font-semibold text-center block hover:bg-poab-navy-surface transition-colors"
                 >
-                  Request a Project Quote
+                  Request a Quote
                 </Link>
               </div>
             </div>
@@ -143,7 +143,7 @@ export default function AboutPage() {
               Our Construction Standards
             </h2>
             <p className="mt-2 text-sm text-poab-charcoal/80 font-light">
-              Every building entrusted to us follows strict structural execution rules designed to protect client capital and safeguard human life.
+              Every project follows disciplined construction standards designed to protect the client&apos;s investment and support long-term building safety.
             </p>
           </div>
 
@@ -175,7 +175,7 @@ export default function AboutPage() {
       <section className="py-16 bg-poab-navy text-white text-center">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="font-heading text-2xl sm:text-3xl font-bold text-white mb-4">
-            Build With Proven Nigerian Site Leadership
+            Build with Proven Nigerian Site Leadership
           </h2>
           <p className="text-sm text-poab-stone/85 font-light mb-8 max-w-xl mx-auto">
             Speak directly with a POAB building representative about your land, architectural plans, or structural renovation project.
@@ -184,7 +184,7 @@ export default function AboutPage() {
             href="/request-quote"
             className="inline-flex items-center space-x-2 px-8 py-3.5 bg-poab-gold text-poab-navy font-semibold text-xs uppercase tracking-wider hover:bg-poab-gold-light transition-colors"
           >
-            <span>Start Consultation</span>
+            <span>Start Your Project</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

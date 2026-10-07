@@ -15,8 +15,8 @@ export function ProjectCtaSection() {
         </div>
 
         <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight mb-6">
-          Planning To Build? <br className="hidden sm:inline" />
-          Start Your Project With POAB.
+          Planning to Build? <br className="hidden sm:inline" />
+          Start Your Project with POAB.
         </h2>
 
         <p className="text-base sm:text-lg text-poab-stone/85 max-w-2xl mx-auto font-light leading-relaxed mb-10">
@@ -28,7 +28,7 @@ export function ProjectCtaSection() {
             href="/request-quote"
             className="w-full sm:w-auto px-8 py-4 bg-poab-gold text-poab-navy font-semibold text-xs uppercase tracking-wider hover:bg-poab-gold-light active:bg-poab-gold-dark transition-colors border border-poab-gold-dark flex items-center justify-center space-x-2"
           >
-            <span>Request a Construction Quote</span>
+            <span>Request a Quote</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
 
@@ -37,7 +37,7 @@ export function ProjectCtaSection() {
             className="w-full sm:w-auto px-8 py-4 bg-poab-navy-surface text-poab-stone hover:text-white hover:bg-poab-navy-muted text-xs uppercase tracking-wider transition-colors border border-poab-navy-muted flex items-center justify-center space-x-2"
           >
             <Mail className="w-4 h-4 text-poab-gold" />
-            <span>Contact Our Office</span>
+            <span>Contact POAB</span>
           </Link>
         </div>
 

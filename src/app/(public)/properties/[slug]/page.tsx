@@ -287,7 +287,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                     href="/request-quote"
                     className="w-full py-3 bg-poab-navy text-white text-xs uppercase tracking-wider font-semibold text-center block hover:bg-poab-navy-surface transition-colors"
                   >
-                    Discuss Building With POAB
+                    Start Your Project
                   </Link>
                 </div>
               ) : (
@@ -314,7 +314,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                       className="w-full py-3 px-4 bg-emerald-700 text-white text-xs uppercase tracking-wider font-semibold text-center flex items-center justify-center space-x-2 hover:bg-emerald-800 transition-colors"
                     >
                       <MessageCircle className="w-4 h-4" />
-                      <span>Inquire via WhatsApp</span>
+                      <span>Enquire via WhatsApp</span>
                     </a>
                   )}
 

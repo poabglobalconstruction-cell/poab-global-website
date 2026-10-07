@@ -8,7 +8,7 @@ import { ProjectCard } from "@/components/projects/ProjectCard";
 
 export const metadata: Metadata = {
   title: "Projects & Proof of Work",
-  description: "Browse verified construction logs and completed projects executed by POAB Global Construction Company Ltd across Nigeria.",
+  description: "Browse construction logs and completed projects executed by POAB Global Construction Company Ltd across Nigeria.",
 };
 
 export const revalidate = 60;
@@ -104,10 +104,10 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
               <FolderKanban className="w-7 h-7 text-poab-navy/60" />
             </div>
             <h2 className="font-heading text-lg font-bold text-poab-navy">
-              No Projects Currently Displayed
+              Project documentation is being prepared for publication.
             </h2>
             <p className="mt-2 text-xs sm:text-sm text-poab-charcoal/70 font-light leading-relaxed">
-              No projects are available in this category yet. Our project gallery is reserved for actual POAB construction work and will be updated as approved project records become available.
+              Selected POAB construction projects will be published here with approved photographs and stage-by-stage project details.
             </p>
             <div className="mt-8 flex justify-center space-x-4">
               {currentFilter !== "All" && (

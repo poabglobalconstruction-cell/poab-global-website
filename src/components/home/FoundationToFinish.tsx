@@ -10,10 +10,10 @@ export function FoundationToFinish() {
         {/* Section Heading */}
         <div className="max-w-3xl mb-16">
           <div className="inline-block px-2.5 py-1 bg-poab-navy-surface text-poab-gold text-xs font-semibold uppercase tracking-wider mb-3 border border-poab-navy-muted">
-            End-To-End Delivery
+            End-to-End Delivery
           </div>
           <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">
-            The Foundation-To-Finish Methodology
+            The Foundation-to-Finish Methodology
           </h2>
           <p className="mt-4 text-sm sm:text-base text-poab-stone/80 font-light leading-relaxed">
             Building in Nigeria demands disciplined site leadership. We take clients through an orderly, step-by-step construction progression with photographic proof at every milestone.

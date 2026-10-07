@@ -46,11 +46,11 @@ export default async function RequestQuotePage({ searchParams }: RequestQuotePag
           </div>
 
           <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-poab-navy mb-4">
-            Request An Honest Construction Quotation
+            Request an Honest Construction Quotation
           </h1>
 
           <p className="text-sm sm:text-base text-poab-charcoal/80 font-light leading-relaxed max-w-2xl mx-auto">
-            Tell us about your land, architectural drawings, or building concept. Every submission receives dedicated review by hands-on site supervisors with 11 years of engineering experience.
+            Tell us about your land, architectural drawings, or building concept. Every submission receives dedicated review by hands-on site supervisors with 11 years of hands-on site engineering experience.
           </p>
         </div>
 

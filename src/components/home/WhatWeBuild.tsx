@@ -10,7 +10,7 @@ export function WhatWeBuild() {
       title: "Residential Construction",
       tagline: "Bungalows, Duplexes & Luxury Homes",
       description:
-        "Engineered residential construction tailored for Nigerian soils and climate. From contemporary duplexes to modern bungalows and bespoke family residences.",
+        "Engineered residential construction tailored for Nigerian terrain and climate. From contemporary duplexes to modern bungalows and bespoke family residences.",
       scopeList: [
         "Storey duplexes & mansions",
         "Modern detached bungalows",
@@ -137,7 +137,7 @@ export function WhatWeBuild() {
                     href={`/request-quote?type=${encodeURIComponent(group.quoteParam)}`}
                     className="px-4 py-2 bg-poab-navy text-poab-stone text-xs uppercase font-medium tracking-wider hover:bg-poab-navy-surface hover:text-white transition-colors"
                   >
-                    Request Quote
+                    Request a Quote
                   </Link>
                 </div>
               </div>

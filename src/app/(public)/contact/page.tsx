@@ -192,7 +192,7 @@ export default function ContactPage() {
           <div className="lg:col-span-7">
             <div className="bg-poab-stone-light border border-poab-grey-border p-8 sm:p-10 shadow-xs">
               <h2 className="font-heading text-xl font-bold text-poab-navy mb-2">
-                Send A General Message
+                Send a General Message
               </h2>
               <p className="text-xs sm:text-sm text-poab-charcoal/70 mb-8 font-light">
                 For detailed construction quotes or building plan uploads, please use our dedicated{" "}

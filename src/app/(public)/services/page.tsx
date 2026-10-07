@@ -6,7 +6,7 @@ import { COMPANY_INFO } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Services",
-  description: `Comprehensive construction capabilities by POAB Global Construction Company Ltd. Residential building, commercial construction, renovation, perimeter fencing, and verified property services across Nigeria.`,
+  description: `Comprehensive construction capabilities by POAB Global Construction Company Ltd. Residential building, commercial construction, renovation, perimeter fencing, and property services across Nigeria.`,
 };
 
 export default function ServicesPage() {
@@ -29,7 +29,7 @@ export default function ServicesPage() {
         },
         {
           name: "Luxury Homes & Villas with Swimming Pools",
-          desc: "Bespoke high-end residential estates incorporating engineered reinforced concrete pools and luxury outdoor terraces.",
+          desc: "Bespoke high-end residential homes featuring integrated swimming pools and spacious outdoor terraces.",
         },
         {
           name: "Apartment Blocks & Self-Contained Units",
@@ -91,7 +91,7 @@ export default function ServicesPage() {
         },
         {
           name: "Deep Trench Foundation Casting",
-          desc: "Excavation to genuine firm ground, vibration compaction, steel rebar cages, and dense concrete footing pours.",
+          desc: "Excavation to firm ground, structured steel reinforcement, and solid concrete footing pours.",
         },
       ],
       quoteType: "Perimeter / Site Work",
@@ -100,21 +100,21 @@ export default function ServicesPage() {
       id: "property-services",
       icon: Building2,
       title: "4. Property Services",
-      tagline: "Property Representation & Acquisition Support",
+      tagline: "Property Sales & Acquisition Support",
       description:
-        "A complementary service connecting serious property seekers with vetted parcels and completed homes, as well as facilitating direct owner-to-buyer sales.",
+        "A complementary service assisting clients with property buying and selling opportunities, connecting prospective homeowners with available parcels and completed homes.",
       offerings: [
         {
           name: "Property Listings & Sales",
-          desc: "Presenting fully vetted parcels of land and built homes in established neighborhoods across Ibadan, Lagos, and surrounding states.",
+          desc: "Presenting reviewed parcels of land and built homes in established neighbourhoods across Ibadan, Lagos, and surrounding states.",
         },
         {
           name: "Seller Representation (Sell With POAB)",
-          desc: "Reviewing title deeds and structural integrity for genuine property owners desiring an honest, scam-free sale channel.",
+          desc: "Assisting property owners with listing presentation, property documentation review, and structured buyer engagement.",
         },
         {
           name: "Site Inspection & Document Review",
-          desc: "Assisting with physical site inspections, layout review, and document checks to give buyers and sellers clarity before concluding transactions.",
+          desc: "Conducting preliminary site visits and document checks to give buyers and sellers clarity before proceeding with transactions.",
         },
       ],
       quoteType: "Other",
@@ -131,10 +131,10 @@ export default function ServicesPage() {
               Scope of Construction Services
             </div>
             <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-6">
-              Complete Building Delivery From Foundation To Finishing.
+              Complete Building Delivery From Foundation to Finishing.
             </h1>
             <p className="text-base sm:text-lg text-poab-stone/85 font-light leading-relaxed">
-              Explore our four core operational divisions. Whether constructing a multi-level duplex, securing virgin land with heavy-duty fencing, or acquiring vetted property, POAB brings 11 years of site engineering experience.
+              Explore our four core operational divisions. Whether constructing a multi-level duplex, securing virgin land with heavy-duty fencing, or exploring property opportunities, POAB brings 11 years of hands-on site engineering experience.
             </p>
           </div>
         </div>
@@ -176,7 +176,7 @@ export default function ServicesPage() {
                       href={`/request-quote?type=${encodeURIComponent(service.quoteType)}`}
                       className="inline-flex items-center space-x-2 px-6 py-3.5 bg-poab-navy text-white text-xs uppercase tracking-wider font-semibold hover:bg-poab-navy-surface transition-colors"
                     >
-                      <span>Discuss This Project</span>
+                      <span>Discuss Your Project</span>
                       <ArrowRight className="w-4 h-4 text-poab-gold" />
                     </Link>
                   </div>
@@ -213,7 +213,7 @@ export default function ServicesPage() {
       <section className="py-16 bg-poab-navy text-white text-center">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="font-heading text-2xl sm:text-3xl font-bold mb-4">
-            Need An Honest Quotation On Your Project?
+            Need an Honest Quotation for Your Project?
           </h2>
           <p className="text-sm text-poab-stone/85 font-light mb-8 max-w-xl mx-auto">
             Share your building plans, site coordinates, or project ideas. Our project team will review and provide a structured proposal.
@@ -222,7 +222,7 @@ export default function ServicesPage() {
             href="/request-quote"
             className="inline-flex items-center space-x-2 px-8 py-3.5 bg-poab-gold text-poab-navy font-semibold text-xs uppercase tracking-wider hover:bg-poab-gold-light transition-colors"
           >
-            <span>Request a Construction Quote</span>
+            <span>Request a Quote</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

@@ -42,8 +42,8 @@ export const PROJECT_TYPES = [
 
 export const CONSTRUCTION_STAGES = [
   { id: "site-prep", title: "Site Preparation & Securing", desc: "Setting out, clearing, perimeter fencing, and staging site security." },
-  { id: "excavation", title: "Excavation & Trenching", desc: "Straight trench excavation to proper depth, correct alignment, and soil testing." },
-  { id: "foundation", title: "Foundation Blockwork & Casting", desc: "Solid foundation blockwork, steel reinforcement, and vibration-compacted concrete filling." },
+  { id: "excavation", title: "Excavation & Trenching", desc: "Straight trench excavation to proper depth and verified trench alignment." },
+  { id: "foundation", title: "Foundation Blockwork & Casting", desc: "Solid foundation blockwork, steel reinforcement, and solid concrete filling." },
   { id: "structural", title: "Superstructure & Slab Casting", desc: "Disciplined blockwork alignment, lintels, columns, and structural concrete slabs." },
   { id: "roofing", title: "Roofing & Carcass Sealing", desc: "Solid roof trusses, timber treatment, durable roof coverings, and rainwater drainage." },
   { id: "finishing", title: "Finishing & Installations", desc: "High-grade plastering, plumbing, electrical conduit, tiling, screeding, and painting." },
@@ -65,6 +65,6 @@ export const CONSTRUCTION_PRINCIPLES = [
   },
   {
     title: "Stage-by-Stage Documentation",
-    desc: "Clients receive transparent photographic proof and updates at every milestones from excavation to finishing.",
+    desc: "Clients receive transparent photographic proof and updates at every milestone, from excavation to finishing.",
   },
 ] as const;

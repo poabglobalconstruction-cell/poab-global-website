@@ -120,7 +120,7 @@ export function SellPropertyForm() {
           Seller Submission Received
         </span>
         <h2 className="font-heading text-2xl font-bold text-poab-navy mb-4">
-          Property Details Logged For Verification
+          Property Details Logged for Review
         </h2>
         <p className="text-sm text-poab-charcoal/80 leading-relaxed font-light mb-8 max-w-lg mx-auto">
           Thank you for contacting POAB Global Construction. Your property submission has been received. Our team will review your submission before contacting you.
@@ -143,7 +143,7 @@ export function SellPropertyForm() {
             Return Home
           </Button>
           <Button href="/properties" variant="primary" size="sm">
-            View Current Listings
+            View Properties
           </Button>
         </div>
       </div>

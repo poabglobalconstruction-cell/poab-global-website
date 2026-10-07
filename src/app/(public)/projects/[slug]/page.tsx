@@ -314,7 +314,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                   href={`/request-quote?inspiration=${encodeURIComponent(project.title)}&type=${encodeURIComponent(project.project_type)}`}
                   className="w-full py-3.5 px-4 bg-poab-navy text-white text-xs uppercase tracking-wider font-semibold text-center block hover:bg-poab-navy-surface transition-colors flex items-center justify-center space-x-2"
                 >
-                  <span>Request a Similar Quote</span>
+                  <span>Request a Quote</span>
                   <ArrowRight className="w-4 h-4 text-poab-gold" />
                 </Link>
               </div>

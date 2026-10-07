@@ -19,7 +19,7 @@ export function HowWeWork() {
       num: "03",
       icon: Ruler,
       title: "Site Assessment",
-      desc: "Physical inspection of the parcel to assess soil condition, topography, access roads, and water table.",
+      desc: "Physical inspection of the parcel to evaluate terrain, site access, and foundational requirements.",
     },
     {
       num: "04",
@@ -31,7 +31,7 @@ export function HowWeWork() {
       num: "05",
       icon: HardHat,
       title: "Construction Phase",
-      desc: "Mobilization on site. Professional day-to-day supervision enforcing straight trenches, proper mix, and rebar integrity.",
+      desc: "Mobilization on site. Professional day-to-day supervision enforcing straight trenches, proper concrete mixes, and structural reinforcement standards.",
     },
     {
       num: "06",

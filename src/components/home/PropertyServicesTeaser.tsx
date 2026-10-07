@@ -20,7 +20,7 @@ export function PropertyServicesTeaser() {
               </h2>
 
               <p className="text-sm text-poab-charcoal/80 font-light leading-relaxed max-w-2xl">
-                In addition to building from scratch, POAB Global Construction facilitates direct property transactions. We assist verified property owners looking to sell genuine parcels or completed buildings, and connect prospective homeowners with vetted properties.
+                Alongside our core construction delivery, POAB also assists clients with property buying and selling opportunities. We help property owners market parcels or completed buildings, and guide prospective buyers through available listings.
               </p>
 
               <div className="pt-2 flex flex-wrap gap-4 text-xs text-poab-charcoal/80 font-medium">
@@ -41,7 +41,7 @@ export function PropertyServicesTeaser() {
                 href="/properties"
                 className="w-full py-3.5 px-6 bg-poab-navy text-white text-xs uppercase tracking-wider font-semibold text-center hover:bg-poab-navy-surface transition-colors flex items-center justify-center space-x-2"
               >
-                <span>View Available Properties</span>
+                <span>View Properties</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
 

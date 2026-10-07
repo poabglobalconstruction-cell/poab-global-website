@@ -23,7 +23,9 @@ export function SelectedProjects({ projects }: SelectedProjectsProps) {
               Selected Site Projects
             </h2>
             <p className="mt-2 text-sm text-poab-charcoal/80 font-light max-w-xl">
-              Real documented projects demonstrating our stage-by-stage construction delivery across residential, commercial, and structural works.
+              {hasProjects
+                ? "Documented projects demonstrating our stage-by-stage construction delivery across residential, commercial, and structural works."
+                : "Selected project documentation is being prepared for publication."}
             </p>
           </div>
 
@@ -49,10 +51,10 @@ export function SelectedProjects({ projects }: SelectedProjectsProps) {
               <FolderKanban className="w-6 h-6 text-poab-navy/60" />
             </div>
             <h3 className="font-heading text-base font-bold text-poab-navy">
-              Project Portfolio Coming Soon
+              Project Documentation in Preparation
             </h3>
             <p className="mt-2 text-xs sm:text-sm text-poab-charcoal/70 max-w-md mx-auto font-light">
-              Our site documentation and project records are currently being prepared for presentation. Full stage-by-stage project logs will be featured here shortly.
+              Selected POAB construction projects will be published here with approved photographs and stage-by-stage project details.
             </p>
             <div className="mt-6">
               <Link
@@ -60,7 +62,7 @@ export function SelectedProjects({ projects }: SelectedProjectsProps) {
                 className="inline-flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-poab-gold bg-poab-navy px-5 py-2.5 hover:bg-poab-navy-surface transition-colors"
               >
                 <Compass className="w-4 h-4 text-poab-gold" />
-                <span>Discuss Your Building Project</span>
+                <span>Discuss Your Project</span>
               </Link>
             </div>
           </div>
