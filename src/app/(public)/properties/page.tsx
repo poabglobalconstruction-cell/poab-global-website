@@ -9,6 +9,9 @@ import { PropertyCard } from "@/components/properties/PropertyCard";
 export const metadata: Metadata = {
   title: "Properties & Land",
   description: "Browse residential properties, land parcels, and commercial developments represented by POAB Global Construction Company Ltd.",
+  alternates: {
+    canonical: "/properties",
+  },
 };
 
 export const revalidate = 60;

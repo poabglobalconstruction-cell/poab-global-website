@@ -1,3 +1,6 @@
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://www.poabglobalconstruction.com";
+
 export const COMPANY_INFO = {
   name: "POAB Global Construction Company Ltd",
   shortName: "POAB Global",

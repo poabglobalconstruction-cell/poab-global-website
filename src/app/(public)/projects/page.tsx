@@ -9,6 +9,9 @@ import { ProjectCard } from "@/components/projects/ProjectCard";
 export const metadata: Metadata = {
   title: "Projects & Proof of Work",
   description: "Browse construction logs and completed projects executed by POAB Global Construction Company Ltd across Nigeria.",
+  alternates: {
+    canonical: "/projects",
+  },
 };
 
 export const revalidate = 60;

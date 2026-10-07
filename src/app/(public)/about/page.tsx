@@ -7,6 +7,9 @@ import { COMPANY_INFO, CONSTRUCTION_PRINCIPLES } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "About Us",
   description: `Learn about POAB Global Construction Company Ltd (RC ${COMPANY_INFO.cacNumber}). 11 years of hands-on site engineering experience delivering foundation-to-finish projects across Nigeria.`,
+  alternates: {
+    canonical: "/about",
+  },
 };
 
 export default function AboutPage() {

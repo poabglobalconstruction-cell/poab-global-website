@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { COMPANY_INFO } from "@/lib/constants";
+import { COMPANY_INFO, SITE_URL } from "@/lib/constants";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -9,6 +9,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  alternates: {
+    canonical: "/",
+  },
   title: {
     default: `${COMPANY_INFO.name} | Foundation to Finish Construction`,
     template: `%s | ${COMPANY_INFO.name}`,
@@ -30,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_NG",
-    url: "https://poabglobal.com",
+    url: SITE_URL,
     title: `${COMPANY_INFO.name} | ${COMPANY_INFO.tagline}`,
     description: `Complete building delivery from foundation to finishing. 11 years of hands-on site engineering experience. RC ${COMPANY_INFO.cacNumber}.`,
     siteName: COMPANY_INFO.name,

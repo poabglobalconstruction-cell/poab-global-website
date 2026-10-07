@@ -6,6 +6,9 @@ import { COMPANY_INFO } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description: `Privacy policy and information handling practices for ${COMPANY_INFO.name}.`,
+  alternates: {
+    canonical: "/privacy",
+  },
 };
 
 export default function PrivacyPage() {

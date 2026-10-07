@@ -7,6 +7,9 @@ import { COMPANY_INFO } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "Services",
   description: `Comprehensive construction capabilities by POAB Global Construction Company Ltd. Residential building, commercial construction, renovation, perimeter fencing, and property services across Nigeria.`,
+  alternates: {
+    canonical: "/services",
+  },
 };
 
 export default function ServicesPage() {

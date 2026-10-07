@@ -8,6 +8,9 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 export const metadata: Metadata = {
   title: "Request a Construction Quote",
   description: "Submit your residential or commercial building project specifications for an honest quotation and site assessment by POAB Global Construction Company Ltd.",
+  alternates: {
+    canonical: "/request-quote",
+  },
 };
 
 interface RequestQuotePageProps {

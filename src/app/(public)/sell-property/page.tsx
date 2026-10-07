@@ -6,6 +6,9 @@ import { SellPropertyForm } from "@/components/sell/SellPropertyForm";
 export const metadata: Metadata = {
   title: "Sell a Property Through POAB",
   description: "Direct seller representation by POAB Global Construction Company Ltd. Submit your land or building for review and listing consideration.",
+  alternates: {
+    canonical: "/sell-property",
+  },
 };
 
 export default function SellPropertyPage() {

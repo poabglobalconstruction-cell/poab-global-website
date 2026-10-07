@@ -75,6 +75,9 @@ export async function generateMetadata({ params }: ProjectDetailPageProps): Prom
   return {
     title: `${project.title} | POAB Global Construction`,
     description: project.short_description,
+    alternates: {
+      canonical: `/projects/${project.slug}`,
+    },
   };
 }
 

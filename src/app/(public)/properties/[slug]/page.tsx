@@ -81,6 +81,9 @@ export async function generateMetadata({ params }: PropertyDetailPageProps): Pro
   return {
     title: `${property.title} (${property.reference}) | POAB Global`,
     description: property.description,
+    alternates: {
+      canonical: `/properties/${property.slug}`,
+    },
   };
 }
 
