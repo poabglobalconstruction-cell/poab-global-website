@@ -11,7 +11,7 @@ async function getSettings(): Promise<{
   socialLinks: SocialLinksSettings;
 }> {
   const defaultContact: ContactChannelsSettings = {
-    official_email: "poabglobalconstruction@gmail.com",
+    official_email: "info@poabglobalconstruction.com",
     public_phone: "",
     whatsapp_number: "",
     office_address: "Ibadan, Oyo State, Nigeria",

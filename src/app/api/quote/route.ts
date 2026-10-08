@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     if (!activeClient && (isProduction || isConfigured)) {
       console.error("[CRITICAL] Database client unavailable during quote submission in production/configured mode.");
       return NextResponse.json(
-        { error: "Database service is currently unavailable. Please contact us directly at poabglobalconstruction@gmail.com." },
+        { error: "Database service is currently unavailable. Please contact us directly at projects@poabglobalconstruction.com." },
         { status: 503 }
       );
     }

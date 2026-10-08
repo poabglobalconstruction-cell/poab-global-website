@@ -6,7 +6,7 @@ export const COMPANY_INFO = {
   shortName: "POAB Global",
   cacNumber: "9896965",
   rcNumber: "RC 9896965",
-  officialEmail: "poabglobalconstruction@gmail.com",
+  officialEmail: "info@poabglobalconstruction.com",
   headOffice: "Ibadan, Oyo State, Nigeria",
   operationsCoverage: "Lagos and Nationwide",
   experienceStatement: "11 years of hands-on site engineering experience",
@@ -14,6 +14,13 @@ export const COMPANY_INFO = {
   tagline: "Building Houses That Stand The Test Of Time.",
   coreProposition: "Complete building delivery from foundation to finishing.",
   positioning: "Foundation to Finish Construction & Property Services",
+} as const;
+
+export const DEPARTMENT_EMAILS = {
+  general: "info@poabglobalconstruction.com",
+  service: "service@poabglobalconstruction.com",
+  projects: "projects@poabglobalconstruction.com",
+  properties: "properties@poabglobalconstruction.com",
 } as const;
 
 export const DEFAULT_BUDGET_OPTIONS = [

@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     if (!supabase && (isProduction || isConfigured)) {
       console.error("[CRITICAL] Supabase client unavailable during contact message submission.");
       return NextResponse.json(
-        { error: "Database service is currently unavailable. Please contact us directly at poabglobalconstruction@gmail.com." },
+        { error: "Database service is currently unavailable. Please contact us directly at info@poabglobalconstruction.com." },
         { status: 503 }
       );
     }
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
       if (insertError) {
         console.error("[CRITICAL] Failed to insert contact message:", insertError.message);
         return NextResponse.json(
-          { error: "Unable to send your message. Please try again or email us directly at poabglobalconstruction@gmail.com." },
+          { error: "Unable to send your message. Please try again or email us directly at info@poabglobalconstruction.com." },
           { status: 500 }
         );
       }

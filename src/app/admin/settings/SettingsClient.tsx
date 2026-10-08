@@ -147,7 +147,7 @@ export function SettingsClient({ initialContact, initialSocials }: SettingsClien
           label="Official Email Address"
           value={contact.official_email}
           onChange={(e) => setContact({ ...contact, official_email: e.target.value })}
-          placeholder="e.g., poabglobalconstruction@gmail.com"
+          placeholder="e.g., info@poabglobalconstruction.com"
         />
 
         <Input

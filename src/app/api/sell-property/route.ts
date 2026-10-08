@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     if (!activeClient && (isProduction || isConfigured)) {
       console.error("[CRITICAL] Database client unavailable during sell-property submission.");
       return NextResponse.json(
-        { error: "Database service is currently unavailable. Please contact us directly at poabglobalconstruction@gmail.com." },
+        { error: "Database service is currently unavailable. Please contact us directly at properties@poabglobalconstruction.com." },
         { status: 503 }
       );
     }

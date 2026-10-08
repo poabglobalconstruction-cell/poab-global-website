@@ -36,7 +36,7 @@ export interface EmailSendResult {
 export async function sendEmail(options: EmailSendOptions): Promise<EmailSendResult> {
   const apiKey = process.env.RESEND_API_KEY;
   const configuredFrom = process.env.EMAIL_FROM || "POAB Website <notifications@poabglobalconstruction.com>";
-  const configuredRecipient = process.env.NOTIFICATION_EMAIL || COMPANY_INFO.officialEmail;
+  const configuredRecipient = process.env.NOTIFICATION_EMAIL || "poabglobalconstruction@gmail.com";
 
   if (!apiKey || apiKey.trim() === "") {
     // Safe server-side warning without exposing secrets or failing the caller

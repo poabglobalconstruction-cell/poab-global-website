@@ -2,8 +2,8 @@ import React from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Home, Building2, Hammer, Shield, CheckCircle } from "lucide-react";
-import { COMPANY_INFO } from "@/lib/constants";
+import { ArrowRight, Home, Building2, Hammer, Shield, CheckCircle, Mail } from "lucide-react";
+import { COMPANY_INFO, DEPARTMENT_EMAILS } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Services",
@@ -259,13 +259,22 @@ export default function ServicesPage() {
           <p className="text-sm text-poab-stone/85 font-light mb-8 max-w-xl mx-auto">
             Share your building plans, site coordinates, or project ideas. Our project team will review and provide a structured proposal.
           </p>
-          <Link
-            href="/request-quote"
-            className="inline-flex items-center space-x-2 px-8 py-3.5 bg-poab-gold text-poab-navy font-semibold text-xs uppercase tracking-wider hover:bg-poab-gold-light transition-colors"
-          >
-            <span>Request a Quote</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/request-quote"
+              className="inline-flex items-center space-x-2 px-8 py-3.5 bg-poab-gold text-poab-navy font-semibold text-xs uppercase tracking-wider hover:bg-poab-gold-light transition-colors"
+            >
+              <span>Request a Quote</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <a
+              href={`mailto:${DEPARTMENT_EMAILS.projects}`}
+              className="inline-flex items-center space-x-2 px-8 py-3.5 bg-poab-navy-surface text-poab-stone hover:text-white hover:bg-poab-navy-muted text-xs uppercase tracking-wider transition-colors border border-poab-navy-muted"
+            >
+              <Mail className="w-4 h-4 text-poab-gold" />
+              <span>Email Projects Desk</span>
+            </a>
+          </div>
         </div>
       </section>
     </div>

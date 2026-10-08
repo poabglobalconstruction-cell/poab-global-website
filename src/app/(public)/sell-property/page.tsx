@@ -2,6 +2,7 @@ import React from "react";
 import type { Metadata } from "next";
 import { Tag, ShieldCheck, CheckCircle } from "lucide-react";
 import { SellPropertyForm } from "@/components/sell/SellPropertyForm";
+import { DEPARTMENT_EMAILS } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Sell a Property Through POAB",
@@ -49,6 +50,20 @@ export default function SellPropertyPage() {
 
         {/* Seller Intake Form */}
         <SellPropertyForm />
+
+        {/* Direct Properties Enquiries Note */}
+        <div className="mt-10 text-center text-xs text-poab-charcoal/70 max-w-lg mx-auto bg-white p-4 border border-poab-grey-border">
+          <p>
+            For property representation questions or general seller enquiries, reach our acquisitions desk at{" "}
+            <a
+              href={`mailto:${DEPARTMENT_EMAILS.properties}`}
+              className="text-poab-navy font-semibold hover:text-poab-gold underline"
+            >
+              {DEPARTMENT_EMAILS.properties}
+            </a>
+            . To safeguard sensitive ownership records, survey plans, and title documents, please submit them through the secure intake form above.
+          </p>
+        </div>
       </div>
     </div>
   );

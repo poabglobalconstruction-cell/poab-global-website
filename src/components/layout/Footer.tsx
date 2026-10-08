@@ -1,9 +1,11 @@
 import React from "react";
 import Link from "next/link";
 import { COMPANY_INFO } from "@/lib/constants";
-import { ShieldCheck, MapPin, Mail, HardHat } from "lucide-react";
+import { getPublicContactSettings } from "@/lib/contact-settings";
+import { ShieldCheck, MapPin, Mail, HardHat, Phone } from "lucide-react";
 
-export function Footer() {
+export async function Footer() {
+  const contact = await getPublicContactSettings();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -99,7 +101,7 @@ export function Footer() {
                 <MapPin className="w-4 h-4 text-poab-gold flex-shrink-0 mt-0.5" />
                 <div>
                   <span className="block font-medium text-white">Head Office:</span>
-                  <span>{COMPANY_INFO.headOffice}</span>
+                  <span>{contact.office_address || COMPANY_INFO.headOffice}</span>
                 </div>
               </div>
 
@@ -111,15 +113,30 @@ export function Footer() {
                 </div>
               </div>
 
+              {contact.public_phone && (
+                <div className="flex items-start space-x-2.5">
+                  <Phone className="w-4 h-4 text-poab-gold flex-shrink-0 mt-0.5" />
+                  <div>
+                    <span className="block font-medium text-white">Phone:</span>
+                    <a
+                      href={`tel:${contact.public_phone.replace(/\s+/g, "")}`}
+                      className="hover:text-poab-gold transition-colors"
+                    >
+                      {contact.public_phone}
+                    </a>
+                  </div>
+                </div>
+              )}
+
               <div className="flex items-start space-x-2.5">
                 <Mail className="w-4 h-4 text-poab-gold flex-shrink-0 mt-0.5" />
                 <div>
                   <span className="block font-medium text-white">Official Email:</span>
                   <a
-                    href={`mailto:${COMPANY_INFO.officialEmail}`}
+                    href={`mailto:${contact.official_email}`}
                     className="hover:text-poab-gold transition-colors"
                   >
-                    {COMPANY_INFO.officialEmail}
+                    {contact.official_email}
                   </a>
                 </div>
               </div>

@@ -2,8 +2,10 @@ import React from "react";
 import Link from "next/link";
 import { ArrowRight, HardHat, Mail } from "lucide-react";
 import { COMPANY_INFO } from "@/lib/constants";
+import { getPublicContactSettings } from "@/lib/contact-settings";
 
-export function ProjectCtaSection() {
+export async function ProjectCtaSection() {
+  const contact = await getPublicContactSettings();
   return (
     <section className="py-20 bg-poab-navy text-white relative overflow-hidden border-b border-poab-navy-surface">
       <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
@@ -44,10 +46,10 @@ export function ProjectCtaSection() {
         <div className="mt-12 text-xs text-poab-stone/60">
           Official Email:{" "}
           <a
-            href={`mailto:${COMPANY_INFO.officialEmail}`}
+            href={`mailto:${contact.official_email}`}
             className="text-poab-gold hover:underline"
           >
-            {COMPANY_INFO.officialEmail}
+            {contact.official_email}
           </a>
         </div>
       </div>

@@ -10,7 +10,12 @@ Built with Next.js (App Router), TypeScript, Tailwind CSS, and Supabase.
 
 - **Company Name**: POAB Global Construction Company Ltd
 - **CAC / RC Number**: RC 9896965
-- **Official Business Email**: poabglobalconstruction@gmail.com
+- **Official Business Email**: info@poabglobalconstruction.com
+- **Departmental Email Routing**:
+  - General Enquiries: `info@poabglobalconstruction.com`
+  - Building Projects & Quotes: `projects@poabglobalconstruction.com`
+  - Properties & Land Acquisition: `properties@poabglobalconstruction.com`
+  - Client Service & Site Support: `service@poabglobalconstruction.com`
 - **Head Office**: Ibadan, Oyo State, Nigeria
 - **Site Operations**: Lagos and Nationwide
 - **Experience Statement**: 11 years of hands-on site engineering experience

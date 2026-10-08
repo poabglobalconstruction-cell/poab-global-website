@@ -1,9 +1,9 @@
 import React from "react";
 import type { Metadata } from "next";
 import { ShieldCheck, HardHat } from "lucide-react";
-import { COMPANY_INFO } from "@/lib/constants";
+import { COMPANY_INFO, DEPARTMENT_EMAILS } from "@/lib/constants";
 import { MultiStepQuoteForm } from "@/components/quote/MultiStepQuoteForm";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getPublicContactSettings } from "@/lib/contact-settings";
 
 export const metadata: Metadata = {
   title: "Request a Construction Quote",
@@ -20,23 +20,9 @@ interface RequestQuotePageProps {
 export default async function RequestQuotePage({ searchParams }: RequestQuotePageProps) {
   const resolvedParams = await searchParams;
 
-  // Fetch whatsapp number from settings if configured
-  let whatsappNumber: string | null = null;
-  try {
-    const supabase = await createServerSupabaseClient();
-    if (supabase) {
-      const { data } = await supabase
-        .from("site_settings")
-        .select("value")
-        .eq("key", "contact_channels")
-        .single();
-      if (data && data.value && typeof data.value === "object") {
-        whatsappNumber = (data.value as { whatsapp_number?: string }).whatsapp_number || null;
-      }
-    }
-  } catch {
-    // fallback gracefully
-  }
+  // Fetch whatsapp number from shared contact settings
+  const contact = await getPublicContactSettings();
+  const whatsappNumber = contact.whatsapp_number || null;
 
   return (
     <div className="bg-poab-stone-light/50 min-h-screen py-12 sm:py-20">
@@ -64,8 +50,22 @@ export default async function RequestQuotePage({ searchParams }: RequestQuotePag
           whatsappNumber={whatsappNumber}
         />
 
+        {/* Direct Projects Consultation Note */}
+        <div className="mt-8 text-center text-xs text-poab-charcoal/70 max-w-lg mx-auto bg-white p-4 border border-poab-grey-border">
+          <p>
+            For project inquiries or general construction questions, reach our engineering desk at{" "}
+            <a
+              href={`mailto:${DEPARTMENT_EMAILS.projects}`}
+              className="text-poab-navy font-semibold hover:text-poab-gold underline"
+            >
+              {DEPARTMENT_EMAILS.projects}
+            </a>
+            . Architectural drawings and building plans should be uploaded directly through the secure form above for protected storage and tracking.
+          </p>
+        </div>
+
         {/* Bottom Security Note */}
-        <div className="mt-12 text-center text-xs text-poab-charcoal/60 max-w-md mx-auto flex items-center justify-center space-x-2">
+        <div className="mt-8 text-center text-xs text-poab-charcoal/60 max-w-md mx-auto flex items-center justify-center space-x-2">
           <ShieldCheck className="w-4 h-4 text-poab-gold flex-shrink-0" />
           <span>
             Your data and building plans are stored securely and never shared with unauthorized third parties.

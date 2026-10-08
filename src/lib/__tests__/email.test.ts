@@ -7,8 +7,21 @@ import {
   sendPropertyEnquiryNotification,
   sendSellPropertyNotification,
 } from "../email";
+import { COMPANY_INFO, DEPARTMENT_EMAILS } from "../constants";
 
 describe("Email Utility & Resend Integration", () => {
+  describe("Company & Department Email Constants", () => {
+    it("configures officialEmail as info@poabglobalconstruction.com", () => {
+      expect(COMPANY_INFO.officialEmail).toBe("info@poabglobalconstruction.com");
+    });
+
+    it("configures the 4 professional departmental forwarding addresses", () => {
+      expect(DEPARTMENT_EMAILS.general).toBe("info@poabglobalconstruction.com");
+      expect(DEPARTMENT_EMAILS.service).toBe("service@poabglobalconstruction.com");
+      expect(DEPARTMENT_EMAILS.projects).toBe("projects@poabglobalconstruction.com");
+      expect(DEPARTMENT_EMAILS.properties).toBe("properties@poabglobalconstruction.com");
+    });
+  });
   const originalEnv = process.env;
 
   beforeEach(() => {
@@ -90,6 +103,32 @@ describe("Email Utility & Resend Integration", () => {
       expect(body.to).toEqual(["poabglobalconstruction@gmail.com"]);
       expect(body.reply_to).toBe("client@example.com");
       expect(body.subject).toBe("[POAB] New Lead Notification");
+    });
+
+    it("falls back to internal official Gmail when NOTIFICATION_EMAIL is not explicitly set", async () => {
+      process.env.RESEND_API_KEY = "re_mock_test_key_12345";
+      delete process.env.NOTIFICATION_EMAIL;
+
+      let capturedInit: RequestInit | undefined;
+      const mockFetch = vi.fn().mockImplementation(async (_url: string, init: RequestInit) => {
+        capturedInit = init;
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ id: "msg_fallback_id" }),
+        };
+      });
+      vi.stubGlobal("fetch", mockFetch);
+
+      const result = await sendEmail({
+        subject: "[POAB] Internal Notification",
+        html: "<p>Internal</p>",
+        text: "Internal",
+      });
+
+      expect(result.success).toBe(true);
+      const body = JSON.parse(capturedInit?.body as string);
+      expect(body.to).toEqual(["poabglobalconstruction@gmail.com"]);
     });
 
     it("safely handles Resend HTTP error responses without throwing", async () => {

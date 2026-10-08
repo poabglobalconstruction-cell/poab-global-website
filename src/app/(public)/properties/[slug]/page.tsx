@@ -9,6 +9,7 @@ import { Property, PropertyImage } from "@/types/database";
 import { Badge } from "@/components/ui/Badge";
 import { formatPrice, buildWhatsAppLink } from "@/lib/utils";
 import { PropertyEnquiryForm } from "@/components/properties/PropertyEnquiryForm";
+import { getPublicContactSettings } from "@/lib/contact-settings";
 
 interface PropertyDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -46,17 +47,9 @@ async function getPropertyBySlug(slug: string): Promise<{
       .eq("property_id", property.id)
       .order("sort_order", { ascending: true });
 
-    // Fetch whatsapp from settings if configured
-    let whatsappNumber: string | null = null;
-    const { data: settingsData } = await supabase
-      .from("site_settings")
-      .select("value")
-      .eq("key", "contact_channels")
-      .single();
-
-    if (settingsData && settingsData.value && typeof settingsData.value === "object") {
-      whatsappNumber = (settingsData.value as { whatsapp_number?: string }).whatsapp_number || null;
-    }
+    // Fetch whatsapp from shared contact settings
+    const contact = await getPublicContactSettings();
+    const whatsappNumber = contact.whatsapp_number || null;
 
     return {
       property,

@@ -2,6 +2,7 @@ import React from "react";
 import type { Metadata } from "next";
 import { ShieldCheck } from "lucide-react";
 import { COMPANY_INFO } from "@/lib/constants";
+import { getPublicContactSettings } from "@/lib/contact-settings";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -11,7 +12,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const contact = await getPublicContactSettings();
   return (
     <div className="bg-white min-h-screen py-16 sm:py-24">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -97,10 +99,10 @@ export default function PrivacyPage() {
             <p>
               We retain lead submissions for the duration of the project inquiry or as needed for business and audit records. If you wish to update or request the removal of your contact details from our records, please contact our administrative team at{" "}
               <a
-                href={`mailto:${COMPANY_INFO.officialEmail}`}
+                href={`mailto:${contact.official_email}`}
                 className="text-poab-gold font-semibold underline"
               >
-                {COMPANY_INFO.officialEmail}
+                {contact.official_email}
               </a>
               .
             </p>
