@@ -19,7 +19,7 @@ export function ConstructionPhilosophy() {
             </h2>
 
             <p className="text-sm sm:text-base text-poab-charcoal/85 leading-relaxed font-light">
-              Most construction problems in Nigeria do not happen during painting or roofing—they happen under the soil during excavation and foundation casting.
+              Most construction problems in Nigeria do not happen during painting or roofing. They occur under the soil during excavation and foundation casting.
             </p>
 
             <p className="text-sm sm:text-base text-poab-charcoal/85 leading-relaxed font-light">

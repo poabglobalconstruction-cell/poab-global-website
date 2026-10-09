@@ -11,16 +11,16 @@ const config: Config = {
       colors: {
         poab: {
           navy: {
-            DEFAULT: "#071B2D",
-            deep: "#04101B",
-            surface: "#0D2942",
-            muted: "#133757",
+            DEFAULT: "#0A1931",
+            deep: "#050C18",
+            surface: "#102342",
+            muted: "#18325C",
           },
           gold: {
-            DEFAULT: "#C89B3C",
-            light: "#DFC077",
-            dark: "#A37B24",
-            subtle: "#F5ECD7",
+            DEFAULT: "#D4AF37",
+            light: "#E2C35D",
+            dark: "#B89628",
+            subtle: "#F7F0D8",
           },
           stone: {
             DEFAULT: "#F3F0E9",

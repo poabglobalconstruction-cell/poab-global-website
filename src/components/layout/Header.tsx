@@ -43,14 +43,26 @@ export function Header() {
         {/* Brand Logo / Slot */}
         <Link
           href="/"
-          className="flex flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poab-gold rounded-sm group"
+          className="flex items-center gap-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poab-gold rounded-sm group"
         >
-          <span className="font-heading text-xl sm:text-2xl font-bold tracking-wider text-white group-hover:text-poab-gold transition-colors">
-            POAB GLOBAL
-          </span>
-          <span className="text-[10px] text-poab-gold uppercase tracking-[0.2em] font-medium">
-            Construction Company Ltd
-          </span>
+          <div className="relative w-10 h-12 flex-shrink-0 flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/poab-pillar.svg"
+              alt="POAB Global Monogram Pillar Logo"
+              width={40}
+              height={48}
+              className="w-full h-full object-contain filter group-hover:brightness-110 transition-all"
+            />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-heading text-xl sm:text-2xl font-bold tracking-wider text-white group-hover:text-poab-gold transition-colors leading-tight">
+              POAB GLOBAL
+            </span>
+            <span className="text-[10px] sm:text-[11px] text-poab-gold uppercase tracking-[0.2em] font-medium leading-tight">
+              Construction Company Ltd
+            </span>
+          </div>
         </Link>
 
         {/* Desktop Navigation */}

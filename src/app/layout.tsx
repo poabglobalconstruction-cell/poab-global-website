@@ -5,7 +5,7 @@ import { COMPANY_INFO, SITE_URL } from "@/lib/constants";
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#071B2D",
+  themeColor: "#0A1931",
 };
 
 export const metadata: Metadata = {
@@ -38,6 +38,14 @@ export const metadata: Metadata = {
     title: `${COMPANY_INFO.name} | ${COMPANY_INFO.tagline}`,
     description: `Complete building delivery from foundation to finishing. 11 years of hands-on site engineering experience. RC ${COMPANY_INFO.cacNumber}.`,
     siteName: COMPANY_INFO.name,
+  },
+  icons: {
+    icon: [
+      { url: "/brand/poab-pillar.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/brand/poab-pillar.svg", type: "image/svg+xml" },
+    ],
   },
   robots: {
     index: true,

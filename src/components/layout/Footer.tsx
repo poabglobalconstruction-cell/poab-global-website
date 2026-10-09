@@ -14,13 +14,25 @@ export async function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Col 1: Brand & Identity */}
           <div className="space-y-4">
-            <div>
-              <span className="font-heading text-xl font-bold tracking-wider text-white block">
-                POAB GLOBAL
-              </span>
-              <span className="text-[11px] text-poab-gold uppercase tracking-[0.2em] font-medium block">
-                Construction Company Ltd
-              </span>
+            <div className="flex items-center gap-3.5">
+              <div className="relative w-10 h-12 flex-shrink-0 flex items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/brand/poab-pillar.svg"
+                  alt="POAB Global Monogram Pillar Logo"
+                  width={40}
+                  height={48}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-heading text-xl font-bold tracking-wider text-white block leading-tight">
+                  POAB GLOBAL
+                </span>
+                <span className="text-[11px] text-poab-gold uppercase tracking-[0.2em] font-medium block leading-tight">
+                  Construction Company Ltd
+                </span>
+              </div>
             </div>
             <p className="text-sm text-poab-stone/80 leading-relaxed">
               &ldquo;{COMPANY_INFO.tagline}&rdquo;
@@ -161,12 +173,6 @@ export async function Footer() {
           <div className="flex items-center space-x-6">
             <Link href="/privacy" className="hover:text-poab-stone transition-colors">
               Privacy Policy
-            </Link>
-            <Link
-              href="/admin/login"
-              className="hover:text-poab-gold transition-colors text-poab-stone/40"
-            >
-              Staff Login
             </Link>
           </div>
         </div>

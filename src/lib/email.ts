@@ -284,7 +284,7 @@ export async function sendQuoteNotification(data: QuoteNotificationData): Promis
 
   const text = `
 [POAB GLOBAL CONSTRUCTION COMPANY LTD]
-NEW QUOTE REQUEST — ${data.reference}
+NEW QUOTE REQUEST: ${data.reference}
 
 Submitted: ${now}
 
@@ -530,7 +530,7 @@ export async function sendSellPropertyNotification(data: SellPropertyNotificatio
 
   const text = `
 [POAB GLOBAL CONSTRUCTION COMPANY LTD]
-NEW PROPERTY SALE REQUEST — ${data.reference}
+NEW PROPERTY SALE REQUEST: ${data.reference}
 
 Submitted: ${now}
 

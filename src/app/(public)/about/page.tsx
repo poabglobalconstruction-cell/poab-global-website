@@ -63,7 +63,7 @@ export default function AboutPage() {
                 Practical Experience Where It Matters: On the Ground.
               </h2>
               <p>
-                At POAB Global Construction Company Ltd, our foundation is built on <strong>11 years of hands-on site engineering experience</strong>. While many contractors supervise projects through third parties or desk estimates, our leadership was shaped directly in the trenches—overseeing excavation depths, testing concrete mixes, and ensuring structural blockwork aligns perfectly.
+                At POAB Global Construction Company Ltd, our foundation is built on <strong>11 years of hands-on site engineering experience</strong>. While many contractors supervise projects through third parties or desk estimates, our leadership was shaped directly in the trenches, overseeing excavation depths, testing concrete mixes, and ensuring structural blockwork aligns perfectly.
               </p>
               <p>
                 Headquartered in Ibadan, Oyo State, with extensive operational coverage in Lagos and across Nigeria, we have earned client trust by doing simple things thoroughly: avoiding shortcuts, issuing honest quotations, and taking total ownership of the building process.
@@ -78,7 +78,7 @@ export default function AboutPage() {
                   &ldquo;{COMPANY_INFO.customerPromise}&rdquo;
                 </p>
                 <span className="block mt-2 text-xs uppercase tracking-wider font-semibold text-poab-charcoal/70">
-                  — Official POAB Delivery Standard
+                  Official POAB Delivery Standard
                 </span>
               </div>
 

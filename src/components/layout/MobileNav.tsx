@@ -36,13 +36,25 @@ export function MobileNav({ isOpen, onClose, navLinks }: MobileNavProps) {
         <div>
           {/* Header */}
           <div className="flex items-center justify-between pb-6 border-b border-poab-navy-surface">
-            <Link href="/" onClick={onClose} className="focus:outline-none">
-              <span className="font-heading text-lg font-bold tracking-wider text-white block">
-                POAB GLOBAL
-              </span>
-              <span className="text-[10px] text-poab-gold uppercase tracking-widest block font-medium">
-                Construction Company Ltd
-              </span>
+            <Link href="/" onClick={onClose} className="flex items-center gap-3 focus:outline-none group">
+              <div className="relative w-8 h-10 flex-shrink-0 flex items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/brand/poab-pillar.svg"
+                  alt="POAB Global Monogram Pillar Logo"
+                  width={32}
+                  height={40}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-heading text-lg font-bold tracking-wider text-white block leading-tight">
+                  POAB GLOBAL
+                </span>
+                <span className="text-[10px] text-poab-gold uppercase tracking-widest block font-medium leading-tight">
+                  Construction Company Ltd
+                </span>
+              </div>
             </Link>
             <button
               type="button"
