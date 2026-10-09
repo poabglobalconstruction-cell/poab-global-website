@@ -5,10 +5,25 @@ import { COMPANY_INFO } from "@/lib/constants";
 import { getPublicContactSettings } from "@/lib/contact-settings";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: `Privacy policy and information handling practices for ${COMPANY_INFO.name}.`,
+  title: {
+    absolute: "Privacy Policy | POAB Global Construction",
+  },
+  description: `Privacy policy and client data handling practices for ${COMPANY_INFO.name}.`,
   alternates: {
     canonical: "/privacy",
+  },
+  openGraph: {
+    title: "Privacy Policy | POAB Global Construction",
+    description: `Privacy policy and client data handling practices for ${COMPANY_INFO.name}.`,
+    url: "/privacy",
+    type: "website",
+    images: [{ url: "/brand/poab-logo.svg", width: 800, height: 600, alt: "POAB Global Privacy Policy" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Privacy Policy | POAB Global Construction",
+    description: `Privacy policy and client data handling practices for ${COMPANY_INFO.name}.`,
+    images: ["/brand/poab-logo.svg"],
   },
 };
 

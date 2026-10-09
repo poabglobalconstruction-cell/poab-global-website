@@ -4,12 +4,32 @@ import { ShieldCheck, HardHat } from "lucide-react";
 import { COMPANY_INFO, DEPARTMENT_EMAILS } from "@/lib/constants";
 import { MultiStepQuoteForm } from "@/components/quote/MultiStepQuoteForm";
 import { getPublicContactSettings } from "@/lib/contact-settings";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { getBreadcrumbSchema } from "@/lib/seo/schema";
 
 export const metadata: Metadata = {
-  title: "Request a Construction Quote",
-  description: "Submit your residential or commercial building project specifications for an honest quotation and site assessment by POAB Global Construction Company Ltd.",
+  title: {
+    absolute: "Request a Construction Quote | POAB Global",
+  },
+  description:
+    "Submit your building project specifications for a transparent quotation and hands-on site assessment from POAB Global Construction Company Ltd.",
   alternates: {
     canonical: "/request-quote",
+  },
+  openGraph: {
+    title: "Request a Construction Quote | POAB Global",
+    description:
+      "Submit your building project specifications for a transparent quotation and hands-on site assessment from POAB Global Construction Company Ltd.",
+    url: "/request-quote",
+    type: "website",
+    images: [{ url: "/brand/poab-logo.svg", width: 800, height: 600, alt: "Request a Construction Quote | POAB Global" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Request a Construction Quote | POAB Global",
+    description:
+      "Submit your building project specifications for a transparent quotation and hands-on site assessment from POAB Global Construction Company Ltd.",
+    images: ["/brand/poab-logo.svg"],
   },
 };
 
@@ -24,8 +44,14 @@ export default async function RequestQuotePage({ searchParams }: RequestQuotePag
   const contact = await getPublicContactSettings();
   const whatsappNumber = contact.whatsapp_number || null;
 
+  const breadcrumbs = getBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Request a Quote", path: "/request-quote" },
+  ]);
+
   return (
     <div className="bg-poab-stone-light/50 min-h-screen py-12 sm:py-20">
+      <JsonLd data={breadcrumbs} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-12">

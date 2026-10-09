@@ -8,6 +8,8 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Project, ProjectStage, ProjectImage } from "@/types/database";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { getBreadcrumbSchema } from "@/lib/seo/schema";
 
 interface ProjectDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -72,11 +74,35 @@ export async function generateMetadata({ params }: ProjectDetailPageProps): Prom
     };
   }
 
+  const imageUrl = project.cover_image_path || "/brand/poab-logo.svg";
+
   return {
-    title: `${project.title} | POAB Global Construction`,
+    title: {
+      absolute: `${project.title} | POAB Global Construction`,
+    },
     description: project.short_description,
     alternates: {
       canonical: `/projects/${project.slug}`,
+    },
+    openGraph: {
+      title: `${project.title} | POAB Global Construction`,
+      description: project.short_description,
+      url: `/projects/${project.slug}`,
+      type: "article",
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: project.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${project.title} | POAB Global Construction`,
+      description: project.short_description,
+      images: [imageUrl],
     },
   };
 }
@@ -89,6 +115,12 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
     notFound();
   }
 
+  const breadcrumbs = getBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Projects", path: "/projects" },
+    { name: project.title, path: `/projects/${project.slug}` },
+  ]);
+
   const statusVariant =
     project.status === "Completed"
       ? "success"
@@ -98,6 +130,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
 
   return (
     <div className="bg-white min-h-screen">
+      <JsonLd data={breadcrumbs} />
       {/* Breadcrumb Bar */}
       <div className="bg-poab-stone-light border-b border-poab-grey-border py-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-xs text-poab-charcoal/70 flex items-center space-x-2">

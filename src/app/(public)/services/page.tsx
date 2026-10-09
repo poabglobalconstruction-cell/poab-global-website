@@ -4,16 +4,40 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Home, Building2, Hammer, Shield, CheckCircle, Mail } from "lucide-react";
 import { COMPANY_INFO, DEPARTMENT_EMAILS } from "@/lib/constants";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { getBreadcrumbSchema } from "@/lib/seo/schema";
 
 export const metadata: Metadata = {
-  title: "Services",
-  description: `Comprehensive construction capabilities by POAB Global Construction Company Ltd. Residential building, commercial construction, renovation, perimeter fencing, and property services across Nigeria.`,
+  title: {
+    absolute: "Building Construction & Renovation Services | POAB Global",
+  },
+  description:
+    "Explore POAB Global's building services: turnkey residential construction, duplexes, bungalows, commercial buildings, structural renovation, and perimeter fencing in Nigeria.",
   alternates: {
     canonical: "/services",
+  },
+  openGraph: {
+    title: "Building Construction & Renovation Services | POAB Global",
+    description:
+      "Explore POAB Global's building services: turnkey residential construction, duplexes, bungalows, commercial buildings, structural renovation, and perimeter fencing in Nigeria.",
+    url: "/services",
+    type: "website",
+    images: [{ url: "/brand/poab-logo.svg", width: 800, height: 600, alt: "POAB Global Construction Services" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Building Construction & Renovation Services | POAB Global",
+    description:
+      "Explore POAB Global's building services: turnkey residential construction, duplexes, bungalows, commercial buildings, structural renovation, and perimeter fencing in Nigeria.",
+    images: ["/brand/poab-logo.svg"],
   },
 };
 
 export default function ServicesPage() {
+  const breadcrumbs = getBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Services", path: "/services" },
+  ]);
   const services = [
     {
       id: "building-construction",
@@ -127,6 +151,7 @@ export default function ServicesPage() {
 
   return (
     <div className="bg-white">
+      <JsonLd data={breadcrumbs} />
       {/* Header with Atmospheric Construction Backdrop */}
       <section className="relative bg-poab-navy text-white py-16 sm:py-24 border-b border-poab-navy-surface overflow-hidden">
         {/* Subtle Background Pattern */}

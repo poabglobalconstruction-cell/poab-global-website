@@ -5,21 +5,26 @@ import { SITE_URL } from "@/lib/constants";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = SITE_URL;
 
-  const staticRoutes: MetadataRoute.Sitemap = [
-    "",
-    "/about",
-    "/services",
-    "/projects",
-    "/properties",
-    "/request-quote",
-    "/sell-property",
-    "/contact",
-    "/privacy",
-  ].map((route) => ({
-    url: `${siteUrl}${route}`,
-    lastModified: new Date(),
-    changeFrequency: route === "" ? "weekly" : "monthly",
-    priority: route === "" ? 1.0 : route === "/request-quote" ? 0.9 : 0.8,
+  // Stable semantic modification date for core static pages
+  const staticLastModified = new Date("2026-10-09T18:00:00.000Z");
+
+  const staticRouteConfigs: { route: string; priority: number; changeFrequency: "daily" | "weekly" | "monthly" | "yearly" }[] = [
+    { route: "", priority: 1.0, changeFrequency: "weekly" },
+    { route: "/services", priority: 0.9, changeFrequency: "weekly" },
+    { route: "/projects", priority: 0.9, changeFrequency: "weekly" },
+    { route: "/request-quote", priority: 0.9, changeFrequency: "monthly" },
+    { route: "/about", priority: 0.8, changeFrequency: "monthly" },
+    { route: "/contact", priority: 0.8, changeFrequency: "monthly" },
+    { route: "/properties", priority: 0.8, changeFrequency: "weekly" },
+    { route: "/sell-property", priority: 0.7, changeFrequency: "monthly" },
+    { route: "/privacy", priority: 0.3, changeFrequency: "yearly" },
+  ];
+
+  const staticRoutes: MetadataRoute.Sitemap = staticRouteConfigs.map((cfg) => ({
+    url: `${siteUrl}${cfg.route}`,
+    lastModified: staticLastModified,
+    changeFrequency: cfg.changeFrequency,
+    priority: cfg.priority,
   }));
 
   try {

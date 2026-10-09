@@ -4,18 +4,41 @@ import Image from "next/image";
 import Link from "next/link";
 import { ShieldCheck, HardHat, CheckCircle2, ArrowRight, MapPin, Building } from "lucide-react";
 import { COMPANY_INFO, CONSTRUCTION_PRINCIPLES } from "@/lib/constants";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { getBreadcrumbSchema } from "@/lib/seo/schema";
 
 export const metadata: Metadata = {
-  title: "About Us",
-  description: `Learn about POAB Global Construction Company Ltd (RC ${COMPANY_INFO.cacNumber}). 11 years of hands-on site engineering experience delivering foundation-to-finish projects across Nigeria.`,
+  title: {
+    absolute: "About POAB Global Construction | Building Expertise in Nigeria",
+  },
+  description: `Learn about POAB Global Construction Company Ltd (RC ${COMPANY_INFO.cacNumber}), founded by Oriowo Abiola Idris with 11 years of hands-on site engineering experience across Nigeria.`,
   alternates: {
     canonical: "/about",
+  },
+  openGraph: {
+    title: "About POAB Global Construction | Building Expertise in Nigeria",
+    description: `Learn about POAB Global Construction Company Ltd (RC ${COMPANY_INFO.cacNumber}), founded by Oriowo Abiola Idris with 11 years of hands-on site engineering experience across Nigeria.`,
+    url: "/about",
+    type: "website",
+    images: [{ url: "/brand/poab-logo.svg", width: 800, height: 600, alt: "About POAB Global Construction" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About POAB Global Construction | Building Expertise in Nigeria",
+    description: `Learn about POAB Global Construction Company Ltd (RC ${COMPANY_INFO.cacNumber}), founded by Oriowo Abiola Idris with 11 years of hands-on site engineering experience across Nigeria.`,
+    images: ["/brand/poab-logo.svg"],
   },
 };
 
 export default function AboutPage() {
+  const breadcrumbs = getBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "About Us", path: "/about" },
+  ]);
+
   return (
     <div className="bg-white">
+      <JsonLd data={breadcrumbs} />
       {/* Page Header with Atmospheric Construction Backdrop */}
       <section className="relative bg-poab-navy text-white py-16 sm:py-24 border-b border-poab-navy-surface overflow-hidden">
         {/* Subtle Background Pattern */}

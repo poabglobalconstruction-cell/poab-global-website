@@ -5,12 +5,32 @@ import { Building, Tag, ArrowRight } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Property } from "@/types/database";
 import { PropertyCard } from "@/components/properties/PropertyCard";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { getBreadcrumbSchema } from "@/lib/seo/schema";
 
 export const metadata: Metadata = {
-  title: "Properties & Land",
-  description: "Browse residential properties, land parcels, and commercial developments represented by POAB Global Construction Company Ltd.",
+  title: {
+    absolute: "Properties & Land for Sale in Nigeria | POAB Global",
+  },
+  description:
+    "Browse verified land parcels and residential properties represented by POAB Global Construction Company Ltd in Ibadan and across Nigeria.",
   alternates: {
     canonical: "/properties",
+  },
+  openGraph: {
+    title: "Properties & Land for Sale in Nigeria | POAB Global",
+    description:
+      "Browse verified land parcels and residential properties represented by POAB Global Construction Company Ltd in Ibadan and across Nigeria.",
+    url: "/properties",
+    type: "website",
+    images: [{ url: "/brand/poab-logo.svg", width: 800, height: 600, alt: "POAB Global Properties" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Properties & Land for Sale in Nigeria | POAB Global",
+    description:
+      "Browse verified land parcels and residential properties represented by POAB Global Construction Company Ltd in Ibadan and across Nigeria.",
+    images: ["/brand/poab-logo.svg"],
   },
 };
 
@@ -54,9 +74,14 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
   const currentStatus = resolvedParams.status || "All";
   const properties = await getPublishedProperties(currentType, currentStatus);
   const hasProperties = properties.length > 0;
+  const breadcrumbs = getBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Properties", path: "/properties" },
+  ]);
 
   return (
     <div className="bg-white min-h-screen">
+      <JsonLd data={breadcrumbs} />
       {/* Header */}
       <section className="bg-poab-navy text-white py-16 sm:py-24 border-b border-poab-navy-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

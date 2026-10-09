@@ -3,18 +3,44 @@ import type { Metadata } from "next";
 import { Tag, ShieldCheck, CheckCircle } from "lucide-react";
 import { SellPropertyForm } from "@/components/sell/SellPropertyForm";
 import { DEPARTMENT_EMAILS } from "@/lib/constants";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { getBreadcrumbSchema } from "@/lib/seo/schema";
 
 export const metadata: Metadata = {
-  title: "Sell a Property Through POAB",
-  description: "Direct seller representation by POAB Global Construction Company Ltd. Submit your land or building for review and listing consideration.",
+  title: {
+    absolute: "Sell Property or Land Through POAB | POAB Global",
+  },
+  description:
+    "Direct seller representation for verified properties and land parcels in Ibadan, Oyo State, and Nigeria by POAB Global Construction Company Ltd.",
   alternates: {
     canonical: "/sell-property",
+  },
+  openGraph: {
+    title: "Sell Property or Land Through POAB | POAB Global",
+    description:
+      "Direct seller representation for verified properties and land parcels in Ibadan, Oyo State, and Nigeria by POAB Global Construction Company Ltd.",
+    url: "/sell-property",
+    type: "website",
+    images: [{ url: "/brand/poab-logo.svg", width: 800, height: 600, alt: "Sell Property Through POAB Global" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sell Property or Land Through POAB | POAB Global",
+    description:
+      "Direct seller representation for verified properties and land parcels in Ibadan, Oyo State, and Nigeria by POAB Global Construction Company Ltd.",
+    images: ["/brand/poab-logo.svg"],
   },
 };
 
 export default function SellPropertyPage() {
+  const breadcrumbs = getBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Sell Property", path: "/sell-property" },
+  ]);
+
   return (
     <div className="bg-poab-stone-light/50 min-h-screen py-12 sm:py-20">
+      <JsonLd data={breadcrumbs} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-12">

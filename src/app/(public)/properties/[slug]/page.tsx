@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/Badge";
 import { formatPrice, buildWhatsAppLink } from "@/lib/utils";
 import { PropertyEnquiryForm } from "@/components/properties/PropertyEnquiryForm";
 import { getPublicContactSettings } from "@/lib/contact-settings";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { getBreadcrumbSchema } from "@/lib/seo/schema";
 
 interface PropertyDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -63,7 +65,7 @@ async function getPropertyBySlug(slug: string): Promise<{
 
 export async function generateMetadata({ params }: PropertyDetailPageProps): Promise<Metadata> {
   const resolvedParams = await params;
-  const { property } = await getPropertyBySlug(resolvedParams.slug);
+  const { property, images } = await getPropertyBySlug(resolvedParams.slug);
 
   if (!property) {
     return {
@@ -71,11 +73,38 @@ export async function generateMetadata({ params }: PropertyDetailPageProps): Pro
     };
   }
 
+  const primaryImage =
+    images.length > 0
+      ? images.find((i) => i.is_primary)?.storage_path || images[0].storage_path
+      : "/brand/poab-logo.svg";
+
   return {
-    title: `${property.title} (${property.reference}) | POAB Global`,
-    description: property.description,
+    title: {
+      absolute: `${property.title} (${property.reference}) | POAB Global Properties`,
+    },
+    description: property.description.slice(0, 160),
     alternates: {
       canonical: `/properties/${property.slug}`,
+    },
+    openGraph: {
+      title: `${property.title} (${property.reference}) | POAB Global Properties`,
+      description: property.description.slice(0, 160),
+      url: `/properties/${property.slug}`,
+      type: "website",
+      images: [
+        {
+          url: primaryImage,
+          width: 1200,
+          height: 630,
+          alt: property.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${property.title} (${property.reference}) | POAB Global Properties`,
+      description: property.description.slice(0, 160),
+      images: [primaryImage],
     },
   };
 }
@@ -88,6 +117,12 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
     notFound();
   }
 
+  const breadcrumbs = getBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Properties", path: "/properties" },
+    { name: property.title, path: `/properties/${property.slug}` },
+  ]);
+
   const isSold = property.status === "Sold";
   const primaryImage =
     images.length > 0
@@ -99,6 +134,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
   return (
     <div className="bg-white min-h-screen">
+      <JsonLd data={breadcrumbs} />
       {/* Breadcrumb Bar */}
       <div className="bg-poab-stone-light border-b border-poab-grey-border py-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-xs text-poab-charcoal/70 flex items-center space-x-2">

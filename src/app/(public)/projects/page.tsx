@@ -6,12 +6,32 @@ import { FolderKanban, Compass } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Project, ProjectType } from "@/types/database";
 import { ProjectCard } from "@/components/projects/ProjectCard";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { getBreadcrumbSchema } from "@/lib/seo/schema";
 
 export const metadata: Metadata = {
-  title: "Our Construction Projects",
-  description: "Browse construction logs and completed projects executed by POAB Global Construction Company Ltd across Nigeria.",
+  title: {
+    absolute: "Construction Projects in Nigeria | POAB Global",
+  },
+  description:
+    "View construction progress and completed building projects by POAB Global Construction Company Ltd across Oyo State, Ogun State, Lagos, and Nigeria.",
   alternates: {
     canonical: "/projects",
+  },
+  openGraph: {
+    title: "Construction Projects in Nigeria | POAB Global",
+    description:
+      "View construction progress and completed building projects by POAB Global Construction Company Ltd across Oyo State, Ogun State, Lagos, and Nigeria.",
+    url: "/projects",
+    type: "website",
+    images: [{ url: "/brand/poab-logo.svg", width: 800, height: 600, alt: "POAB Global Construction Projects" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Construction Projects in Nigeria | POAB Global",
+    description:
+      "View construction progress and completed building projects by POAB Global Construction Company Ltd across Oyo State, Ogun State, Lagos, and Nigeria.",
+    images: ["/brand/poab-logo.svg"],
   },
 };
 
@@ -52,9 +72,14 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   const currentFilter = resolvedParams.type || "All";
   const projects = await getPublishedProjects(currentFilter);
   const hasProjects = projects.length > 0;
+  const breadcrumbs = getBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Projects", path: "/projects" },
+  ]);
 
   return (
     <div className="bg-white min-h-screen">
+      <JsonLd data={breadcrumbs} />
       {/* Header with Atmospheric Construction Backdrop */}
       <section className="relative bg-poab-navy text-white py-16 sm:py-24 border-b border-poab-navy-surface overflow-hidden">
         {/* Subtle Background Pattern */}
