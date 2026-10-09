@@ -24,6 +24,7 @@ import { Input, Textarea } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { DeleteConfirmationModal } from "@/components/admin/DeleteConfirmationModal";
 import { AdminImageUploader } from "@/components/admin/AdminImageUploader";
+import { MultiImageUploader, ProjectPhotoItem } from "@/components/admin/MultiImageUploader";
 
 interface EditProjectClientProps {
   initialProject: Project;
@@ -41,7 +42,47 @@ export function EditProjectClient({
 
   const [project, setProject] = useState(initialProject);
   const [stages, setStages] = useState(initialStages);
-  const [images, setImages] = useState(initialImages);
+
+  // Initialize unified photos from initialImages, ensuring cover image is represented
+  const initialUnifiedPhotos: ProjectPhotoItem[] = React.useMemo(() => {
+    let list: ProjectPhotoItem[] = initialImages.map((img, idx) => ({
+      id: img.id,
+      storage_path: img.storage_path,
+      alt_text: img.alt_text || initialProject.title,
+      caption: img.caption,
+      sort_order: typeof img.sort_order === "number" ? img.sort_order : idx,
+      is_cover: Boolean(
+        img.is_cover ||
+        (initialProject.cover_image_path && img.storage_path === initialProject.cover_image_path)
+      ),
+      project_stage_id: img.project_stage_id || null,
+    }));
+
+    // If project has cover_image_path not in initialImages, prepend it
+    if (
+      initialProject.cover_image_path &&
+      !list.some((p) => p.storage_path === initialProject.cover_image_path)
+    ) {
+      list = [
+        {
+          id: crypto.randomUUID(),
+          storage_path: initialProject.cover_image_path,
+          alt_text: initialProject.title,
+          caption: null,
+          sort_order: 0,
+          is_cover: true,
+          project_stage_id: null,
+        },
+        ...list.map((p, idx) => ({ ...p, sort_order: idx + 1 })),
+      ];
+    } else if (list.length > 0 && !list.some((p) => p.is_cover)) {
+      list[0].is_cover = true;
+    }
+
+    return list;
+  }, [initialImages, initialProject]);
+
+  const [photos, setPhotos] = useState<ProjectPhotoItem[]>(initialUnifiedPhotos);
 
   // Editing stage state
   const [editingStageId, setEditingStageId] = useState<string | null>(null);
@@ -78,11 +119,15 @@ export function EditProjectClient({
     setErrorMessage(null);
 
     try {
+      const coverPhoto = photos.find((p) => p.is_cover) || photos[0];
+      const resolvedCover = coverPhoto ? coverPhoto.storage_path : project.cover_image_path || null;
+
       const payload = {
         ...project,
+        cover_image_path: resolvedCover,
         ...(project.published ? { archived_at: null } : {}),
         stages,
-        images,
+        images: photos,
       };
 
       const res = await fetch("/api/admin/projects", {
@@ -94,9 +139,11 @@ export function EditProjectClient({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to update project");
 
-      if (project.published) {
-        setProject((prev) => ({ ...prev, archived_at: null }));
-      }
+      setProject((prev) => ({
+        ...prev,
+        cover_image_path: resolvedCover,
+        ...(project.published ? { archived_at: null } : {}),
+      }));
       setStatusMessage("Project specifications, timeline stages, and gallery images saved successfully.");
       router.refresh();
     } catch (err: unknown) {
@@ -239,30 +286,36 @@ export function EditProjectClient({
   };
 
   const removeStage = (id: string) => {
-    // Also decouple images from removed stage
-    setImages(images.map((img) => (img.project_stage_id === id ? { ...img, project_stage_id: null } : img)));
+    // Decouple photos from removed stage
+    setPhotos(photos.map((p) => (p.project_stage_id === id ? { ...p, project_stage_id: null } : p)));
     setStages(stages.filter((s) => s.id !== id).map((s, idx) => ({ ...s, sort_order: idx })));
   };
 
-  // Gallery photo additions
-  const handleAddGalleryImage = (storagePath: string, publicUrl: string, stageId?: string) => {
-    const newImg: ProjectImage = {
+  // Stage-associated photo addition
+  const handleAddStagePhoto = (storagePath: string, publicUrl: string, stageId: string) => {
+    const newPhoto: ProjectPhotoItem = {
       id: crypto.randomUUID(),
-      project_id: project.id,
-      project_stage_id: stageId || null,
       storage_path: publicUrl,
       alt_text: project.title,
       caption: null,
-      sort_order: images.length,
+      sort_order: photos.length,
       is_cover: false,
-      created_at: new Date().toISOString(),
+      project_stage_id: stageId,
     };
-    setImages([...images, newImg]);
-    setStatusMessage("Photo added to gallery. Click 'Save Changes' to save your updates.");
+    setPhotos([...photos, newPhoto]);
+    setStatusMessage("Stage photograph added. Click 'Save Changes' to save your updates.");
   };
 
-  const removeGalleryImage = (id: string) => {
-    setImages(images.filter((img) => img.id !== id));
+  const removePhotoById = (id: string) => {
+    const photoToRemove = photos.find((p) => p.id === id);
+    const remaining = photos
+      .filter((p) => p.id !== id)
+      .map((p, idx) => ({ ...p, sort_order: idx }));
+
+    if (photoToRemove?.is_cover && remaining.length > 0) {
+      remaining[0].is_cover = true;
+    }
+    setPhotos(remaining);
   };
 
   return (
@@ -426,16 +479,16 @@ export function EditProjectClient({
           onChange={(e) => setProject({ ...project, description: e.target.value })}
         />
 
-        {/* Direct Cover Image Uploader */}
-        <div className="p-4 bg-poab-stone-light/40 border border-poab-grey-border space-y-3">
-          <AdminImageUploader
+        {/* Project Photography & Multi-Image Gallery Manager */}
+        <div className="p-4 sm:p-6 bg-poab-stone-light/40 border border-poab-grey-border space-y-4">
+          <MultiImageUploader
             bucket="project-images"
-            folder="covers"
-            label="Project Cover Photo"
-            helperText="Select a high-quality photograph for the project cover."
-            currentValue={project.cover_image_path || ""}
-            onUploadComplete={(path, url) => setProject((prev) => ({ ...prev, cover_image_path: url }))}
-            onRemove={() => setProject((prev) => ({ ...prev, cover_image_path: "" }))}
+            folder="projects"
+            label="Project Photographs, Cover Photo & Gallery"
+            helperText="Select several photographs to upload at once. You can add more, reorder, assign photos to construction stages, and select any photo as the primary cover using 'Set as Cover'."
+            photos={photos}
+            onChange={setPhotos}
+            availableStages={stages.map((s) => ({ id: s.id, title: s.title }))}
           />
         </div>
 
@@ -494,7 +547,6 @@ export function EditProjectClient({
           <div className="space-y-4">
             {stages.map((stage, idx) => {
               const isEditingThis = editingStageId === stage.id;
-              const stageImages = images.filter((i) => i.project_stage_id === stage.id);
 
               return (
                 <div
@@ -562,29 +614,31 @@ export function EditProjectClient({
                         )}
 
                         {/* Stage Photos Gallery */}
-                        {stageImages.length > 0 && (
+                        {photos.filter((p) => p.project_stage_id === stage.id).length > 0 && (
                           <div className="mt-3 flex flex-wrap gap-2">
-                            {stageImages.map((img) => (
-                              <div
-                                key={img.id}
-                                className="relative w-16 h-14 bg-poab-stone border border-poab-grey-border group overflow-hidden"
-                              >
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                  src={img.storage_path}
-                                  alt={img.alt_text}
-                                  className="w-full h-full object-cover"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => removeGalleryImage(img.id)}
-                                  className="absolute inset-0 bg-red-900/80 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
-                                  title="Remove photo"
+                            {photos
+                              .filter((p) => p.project_stage_id === stage.id)
+                              .map((img) => (
+                                <div
+                                  key={img.id}
+                                  className="relative w-16 h-14 bg-poab-stone border border-poab-grey-border group overflow-hidden"
                                 >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                            ))}
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img
+                                    src={img.storage_path}
+                                    alt={img.alt_text}
+                                    className="w-full h-full object-cover"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => removePhotoById(img.id)}
+                                    className="absolute inset-0 bg-red-900/80 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                                    title="Remove photo"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              ))}
                           </div>
                         )}
                       </div>
@@ -636,7 +690,7 @@ export function EditProjectClient({
                         folder={`stages/${stage.id.slice(0, 8)}`}
                         label={`Add Progress Photograph for Stage 0${idx + 1}`}
                         helperText="Select photographs representing work completed in this stage."
-                        onUploadComplete={(path, url) => handleAddGalleryImage(path, url, stage.id)}
+                        onUploadComplete={(path, url) => handleAddStagePhoto(path, url, stage.id)}
                       />
                     </div>
                   )}

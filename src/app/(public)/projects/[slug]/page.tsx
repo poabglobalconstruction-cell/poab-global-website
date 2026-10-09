@@ -203,9 +203,41 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                         </h3>
 
                         {stage.description && (
-                          <p className="text-xs sm:text-sm text-poab-charcoal/80 leading-relaxed font-light">
+                          <p className="text-xs sm:text-sm text-poab-charcoal/80 leading-relaxed font-light mb-3">
                             {stage.description}
                           </p>
+                        )}
+
+                        {/* Stage Specific Photographs */}
+                        {images.filter((img) => img.project_stage_id === stage.id).length > 0 && (
+                          <div className="mt-4 pt-3 border-t border-poab-grey-border/60">
+                            <span className="text-[10px] uppercase font-mono font-bold tracking-wider text-poab-navy/60 block mb-2">
+                              Stage Documentation Photos:
+                            </span>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                              {images
+                                .filter((img) => img.project_stage_id === stage.id)
+                                .map((img) => (
+                                  <div
+                                    key={img.id}
+                                    className="relative aspect-[4/3] bg-poab-stone border border-poab-grey-border overflow-hidden group"
+                                  >
+                                    <Image
+                                      src={img.storage_path}
+                                      alt={img.alt_text || `${stage.title} photograph`}
+                                      fill
+                                      className="object-cover group-hover:scale-105 transition-transform duration-200"
+                                      sizes="(max-width: 640px) 50vw, 33vw"
+                                    />
+                                    {img.caption && (
+                                      <div className="absolute bottom-0 inset-x-0 bg-poab-navy/85 text-white text-[10px] p-1 truncate">
+                                        {img.caption}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                            </div>
+                          </div>
                         )}
                       </div>
                     </div>

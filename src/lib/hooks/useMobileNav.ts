@@ -57,16 +57,39 @@ export function useMobileNav(options: MobileNavOptions = {}) {
     return () => window.removeEventListener("resize", handleResize);
   }, [isOpen, breakpoint]);
 
-  // 4. Safely manage body scroll lock with cleanup guarantee
+  // 4. Robust cross-browser and mobile Safari body scroll lock with scroll position preservation
   useEffect(() => {
+    if (typeof document === "undefined") return;
+
     if (isOpen) {
-      const originalStyle = window.getComputedStyle(document.body).overflow;
+      const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+      const originalBodyOverflow = document.body.style.overflow;
+      const originalBodyPosition = document.body.style.position;
+      const originalBodyTop = document.body.style.top;
+      const originalBodyWidth = document.body.style.width;
+      const originalHtmlOverflow = document.documentElement.style.overflow;
+
+      // Lock documentElement and fixed body with negative top offset for iOS Safari
+      document.documentElement.style.overflow = "hidden";
       document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = "100%";
+
       return () => {
-        document.body.style.overflow = originalStyle === "hidden" ? "" : originalStyle;
+        document.documentElement.style.overflow = originalHtmlOverflow;
+        document.body.style.overflow = originalBodyOverflow;
+        document.body.style.position = originalBodyPosition;
+        document.body.style.top = originalBodyTop;
+        document.body.style.width = originalBodyWidth;
+        window.scrollTo(0, scrollY);
       };
     } else {
+      document.documentElement.style.overflow = "";
       document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
     }
   }, [isOpen]);
 

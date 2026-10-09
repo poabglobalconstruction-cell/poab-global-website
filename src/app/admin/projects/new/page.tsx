@@ -6,11 +6,13 @@ import Link from "next/link";
 import { ArrowLeft, Save, AlertCircle, Layers } from "lucide-react";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { AdminImageUploader } from "@/components/admin/AdminImageUploader";
+import { MultiImageUploader, ProjectPhotoItem } from "@/components/admin/MultiImageUploader";
 
 export default function NewProjectPage() {
   const router = useRouter();
   const errorRef = useRef<HTMLDivElement>(null);
+
+  const [photos, setPhotos] = useState<ProjectPhotoItem[]>([]);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -82,10 +84,20 @@ export default function NewProjectPage() {
     setIsLoading(true);
 
     try {
+      // Find the chosen cover photo, or the first photo, if any were uploaded
+      const coverPhoto = photos.find((p) => p.is_cover) || photos[0];
+      const resolvedCoverPath = coverPhoto ? coverPhoto.storage_path : formData.cover_image_path || null;
+
+      const payload = {
+        ...formData,
+        cover_image_path: resolvedCoverPath,
+        images: photos,
+      };
+
       const res = await fetch("/api/admin/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -225,16 +237,15 @@ export default function NewProjectPage() {
           placeholder="Complete breakdown of excavation, structural blockwork, concrete mix, roofing and finishing specifications..."
         />
 
-        {/* Direct Photo Uploader for Cover Image */}
-        <div className="p-4 bg-poab-stone-light/40 border border-poab-grey-border space-y-3">
-          <AdminImageUploader
+        {/* Project Photography & Multi-Image Uploader */}
+        <div className="p-4 sm:p-6 bg-poab-stone-light/40 border border-poab-grey-border space-y-4">
+          <MultiImageUploader
             bucket="project-images"
-            folder="covers"
-            label="Project Cover Photo (Optional)"
-            helperText="Select a clear photo of the project from your phone or computer. You can also add or change this later."
-            currentValue={formData.cover_image_path}
-            onUploadComplete={(path, url) => setFormData((prev) => ({ ...prev, cover_image_path: url }))}
-            onRemove={() => setFormData((prev) => ({ ...prev, cover_image_path: "" }))}
+            folder="projects"
+            label="Project Photographs & Cover Selection"
+            helperText="Upload multiple photographs from your device together. Set any photo as the project's primary cover using 'Set as Cover'."
+            photos={photos}
+            onChange={setPhotos}
           />
         </div>
 

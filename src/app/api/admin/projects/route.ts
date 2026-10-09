@@ -71,6 +71,24 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // If initial project images were uploaded during creation, insert them
+    if (Array.isArray(body.images) && body.images.length > 0) {
+      const imagesToInsert = body.images.map((img: any, idx: number) => ({
+        id: img.id && img.id.length === 36 ? img.id : crypto.randomUUID(),
+        project_id: data.id,
+        project_stage_id: img.project_stage_id || null,
+        storage_path: img.storage_path,
+        alt_text: img.alt_text || body.title,
+        caption: img.caption || null,
+        sort_order: typeof img.sort_order === "number" ? img.sort_order : idx,
+        is_cover: Boolean(img.is_cover),
+      }));
+      const { error: imgError } = await client.from("project_images").insert(imagesToInsert);
+      if (imgError) {
+        console.error("Error inserting initial project images:", imgError);
+      }
+    }
+
     try {
       revalidatePath("/");
       revalidatePath("/projects");
