@@ -29,7 +29,14 @@ export function AdminHeader({ title, isOpen = false, onOpenMobileMenu }: AdminHe
 
       <div className="flex items-center space-x-3 text-xs">
         <div className="flex items-center space-x-1.5 px-2.5 py-1 bg-poab-stone-light border border-poab-grey-border text-poab-navy">
-          <ShieldCheck className="w-3.5 h-3.5 text-poab-gold" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/brand/poab-pillar.svg"
+            alt="POAB"
+            width={14}
+            height={16}
+            className="w-3.5 h-4 object-contain"
+          />
           <span className="font-semibold uppercase tracking-wider text-[10px]">
             Admin Session
           </span>

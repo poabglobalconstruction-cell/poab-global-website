@@ -86,7 +86,7 @@ export async function sendEmail(options: EmailSendOptions): Promise<EmailSendRes
 }
 
 // ---------------------------------------------------------------------------
-// HTML Email Layout Wrapper (Navy #071B2D & Gold #C89B3C Visual Identity)
+// HTML Email Layout Wrapper (Navy #0A1931 & Gold #D4AF37 Visual Identity)
 // ---------------------------------------------------------------------------
 
 function renderEmailLayout(params: {
@@ -100,7 +100,7 @@ function renderEmailLayout(params: {
   const adminButton = params.actionUrl
     ? `
       <div style="margin: 28px 0 12px; text-align: left;">
-        <a href="${escapeHtml(params.actionUrl)}" style="display: inline-block; background-color: #C89B3C; color: #071B2D; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 24px; text-decoration: none; border-radius: 2px;">
+        <a href="${escapeHtml(params.actionUrl)}" style="display: inline-block; background-color: #D4AF37; color: #0A1931; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 24px; text-decoration: none; border-radius: 2px;">
           ${escapeHtml(params.actionText || "Review in Admin Portal")} &rarr;
         </a>
       </div>
@@ -122,17 +122,22 @@ function renderEmailLayout(params: {
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
           <!-- Top Header Strip (Navy & Gold Accent) -->
           <tr>
-            <td style="background-color: #071B2D; padding: 24px 28px; border-bottom: 3px solid #C89B3C;">
+            <td style="background-color: #0A1931; padding: 22px 28px; border-bottom: 3px solid #D4AF37;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td>
-                    <div style="color: #C89B3C; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px;">
+                  <td style="vertical-align: middle; width: 48px; padding-right: 16px;">
+                    <a href="${SITE_URL}" style="display: block; text-decoration: none;">
+                      <img src="${SITE_URL}/brand/poab-pillar.svg" alt="POAB Global" width="40" height="48" style="display: block; width: 40px; height: 48px; border: 0;" />
+                    </a>
+                  </td>
+                  <td style="vertical-align: middle;">
+                    <div style="color: #D4AF37; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 3px;">
                       ${escapeHtml(params.badgeText)}
                     </div>
-                    <div style="color: #FFFFFF; font-size: 18px; font-weight: 700; letter-spacing: -0.01em;">
+                    <div style="color: #FFFFFF; font-size: 18px; font-weight: 700; letter-spacing: 0.02em; line-height: 1.2;">
                       POAB GLOBAL CONSTRUCTION COMPANY LTD
                     </div>
-                    <div style="color: #94A3B8; font-size: 11px; margin-top: 2px;">
+                    <div style="color: #94A3B8; font-size: 11px; margin-top: 3px; letter-spacing: 0.05em;">
                       RC 9896965 &bull; Official Management Notification
                     </div>
                   </td>
@@ -144,7 +149,7 @@ function renderEmailLayout(params: {
           <!-- Heading Area -->
           <tr>
             <td style="padding: 24px 28px 12px; border-bottom: 1px solid #F1F5F9;">
-              <h1 style="margin: 0; font-size: 20px; font-weight: 700; color: #071B2D; line-height: 1.3;">
+              <h1 style="margin: 0; font-size: 20px; font-weight: 700; color: #0A1931; line-height: 1.3;">
                 ${escapeHtml(params.title)}
               </h1>
               ${
@@ -166,7 +171,7 @@ function renderEmailLayout(params: {
           <!-- Footer Area -->
           <tr>
             <td style="background-color: #F8FAFC; padding: 18px 28px; border-top: 1px solid #E2E8F0; color: #64748B; font-size: 11px; line-height: 1.5;">
-              <div style="font-weight: 600; color: #071B2D; margin-bottom: 2px;">POAB Global Construction Company Ltd</div>
+              <div style="font-weight: 600; color: #0A1931; margin-bottom: 2px;">POAB Global Construction Company Ltd</div>
               <div>Head Office: Ibadan, Oyo State &bull; Site Operations: Lagos & Nationwide</div>
               <div style="margin-top: 6px; color: #94A3B8;">
                 This is an automated notification from your website. Do not reply to this system message directly; use the customer contact details provided above.
@@ -185,10 +190,10 @@ function renderFieldRow(label: string, value: string | null | undefined, isHighl
   if (!value) return "";
   return `
     <tr>
-      <td style="padding: 8px 0; border-bottom: 1px solid #F1F5F9; width: 38%; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: ${isHighlight ? "#C89B3C" : "#64748B"}; vertical-align: top;">
+      <td style="padding: 8px 0; border-bottom: 1px solid #F1F5F9; width: 38%; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: ${isHighlight ? "#D4AF37" : "#64748B"}; vertical-align: top;">
         ${escapeHtml(label)}
       </td>
-      <td style="padding: 8px 0; border-bottom: 1px solid #F1F5F9; font-size: 13px; color: #071B2D; font-weight: ${isHighlight ? "700" : "500"}; vertical-align: top;">
+      <td style="padding: 8px 0; border-bottom: 1px solid #F1F5F9; font-size: 13px; color: #0A1931; font-weight: ${isHighlight ? "700" : "500"}; vertical-align: top;">
         ${escapeHtml(value)}
       </td>
     </tr>
@@ -246,16 +251,16 @@ export async function sendQuoteNotification(data: QuoteNotificationData): Promis
       ${renderFieldRow("Submission Time", now)}
     </table>
 
-    <div style="margin-top: 16px; padding: 14px 16px; background-color: #F8FAFC; border-left: 3px solid #071B2D; font-size: 13px; color: #1E293B; line-height: 1.6;">
-      <strong style="color: #071B2D; display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Project Description / Scope:</strong>
+    <div style="margin-top: 16px; padding: 14px 16px; background-color: #F8FAFC; border-left: 3px solid #0A1931; font-size: 13px; color: #1E293B; line-height: 1.6;">
+      <strong style="color: #0A1931; display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Project Description / Scope:</strong>
       ${escapeHtml(data.description)}
     </div>
 
     ${
       data.project_inspiration
         ? `
-      <div style="margin-top: 12px; padding: 12px 16px; background-color: #FFFDF8; border-left: 3px solid #C89B3C; font-size: 12px; color: #64748B; line-height: 1.5;">
-        <strong style="color: #C89B3C; display: block; margin-bottom: 2px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;">Client Inspiration Note:</strong>
+      <div style="margin-top: 12px; padding: 12px 16px; background-color: #FFFDF8; border-left: 3px solid #D4AF37; font-size: 12px; color: #64748B; line-height: 1.5;">
+        <strong style="color: #D4AF37; display: block; margin-bottom: 2px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;">Client Inspiration Note:</strong>
         ${escapeHtml(data.project_inspiration)}
       </div>
     `
@@ -348,8 +353,8 @@ export async function sendContactNotification(data: ContactNotificationData): Pr
       ${renderFieldRow("Submission Time", now)}
     </table>
 
-    <div style="margin-top: 16px; padding: 16px; background-color: #F8FAFC; border-left: 3px solid #071B2D; font-size: 13px; color: #1E293B; line-height: 1.6;">
-      <strong style="color: #071B2D; display: block; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Message Content:</strong>
+    <div style="margin-top: 16px; padding: 16px; background-color: #F8FAFC; border-left: 3px solid #0A1931; font-size: 13px; color: #1E293B; line-height: 1.6;">
+      <strong style="color: #0A1931; display: block; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Message Content:</strong>
       ${escapeHtml(data.message)}
     </div>
   `;
@@ -420,8 +425,8 @@ export async function sendPropertyEnquiryNotification(data: PropertyEnquiryNotif
       ${renderFieldRow("Submission Time", now)}
     </table>
 
-    <div style="margin-top: 16px; padding: 16px; background-color: #F8FAFC; border-left: 3px solid #C89B3C; font-size: 13px; color: #1E293B; line-height: 1.6;">
-      <strong style="color: #071B2D; display: block; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Client Inquiry Message:</strong>
+    <div style="margin-top: 16px; padding: 16px; background-color: #F8FAFC; border-left: 3px solid #D4AF37; font-size: 13px; color: #1E293B; line-height: 1.6;">
+      <strong style="color: #0A1931; display: block; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Client Inquiry Message:</strong>
       ${escapeHtml(data.message)}
     </div>
   `;
@@ -503,8 +508,8 @@ export async function sendSellPropertyNotification(data: SellPropertyNotificatio
       ${renderFieldRow("Submission Time", now)}
     </table>
 
-    <div style="margin-top: 16px; padding: 16px; background-color: #F8FAFC; border-left: 3px solid #071B2D; font-size: 13px; color: #1E293B; line-height: 1.6;">
-      <strong style="color: #071B2D; display: block; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Property & Title Details:</strong>
+    <div style="margin-top: 16px; padding: 16px; background-color: #F8FAFC; border-left: 3px solid #0A1931; font-size: 13px; color: #1E293B; line-height: 1.6;">
+      <strong style="color: #0A1931; display: block; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Property & Title Details:</strong>
       ${escapeHtml(data.description)}
     </div>
 

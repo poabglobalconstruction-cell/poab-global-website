@@ -73,13 +73,20 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md bg-white border border-poab-navy-surface shadow-2xl p-8 sm:p-10">
         {/* Brand Icon & Heading */}
         <div className="text-center mb-8">
-          <div className="w-12 h-12 bg-poab-navy text-poab-gold mx-auto flex items-center justify-center mb-4">
-            <HardHat className="w-6 h-6" />
+          <div className="w-16 h-20 mx-auto flex items-center justify-center mb-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/poab-pillar.svg"
+              alt="POAB Global Monogram Pillar Logo"
+              width={54}
+              height={64}
+              className="w-full h-full object-contain"
+            />
           </div>
-          <span className="font-heading text-lg font-bold tracking-wider text-poab-navy block">
+          <span className="font-heading text-xl font-bold tracking-wider text-poab-navy block">
             POAB GLOBAL
           </span>
-          <span className="text-[10px] text-poab-gold uppercase tracking-widest font-semibold block">
+          <span className="text-[11px] text-poab-gold uppercase tracking-[0.2em] font-semibold block mt-0.5">
             POAB Administration
           </span>
         </div>
