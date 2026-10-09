@@ -1,5 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { FolderKanban, Compass } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -54,11 +55,28 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
 
   return (
     <div className="bg-white min-h-screen">
-      {/* Header */}
-      <section className="bg-poab-navy text-white py-16 sm:py-24 border-b border-poab-navy-surface">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Header with Atmospheric Construction Backdrop */}
+      <section className="relative bg-poab-navy text-white py-16 sm:py-24 border-b border-poab-navy-surface overflow-hidden">
+        {/* Subtle Background Pattern */}
+        <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
+
+        {/* Atmospheric Construction Environment Backdrop */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <Image
+            src="/images/illustrative/nigeria-construction-ramp.jpg"
+            alt="Active construction site operations in Nigeria"
+            fill
+            priority
+            className="object-cover object-[center_35%] opacity-45 md:opacity-50 scale-102"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-poab-navy via-poab-navy/90 to-poab-navy/55" />
+          <div className="absolute inset-0 bg-gradient-to-t from-poab-navy via-poab-navy/35 to-poab-navy/60" />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <div className="inline-block px-2.5 py-1 bg-poab-navy-surface text-poab-gold text-xs uppercase tracking-wider mb-4 border border-poab-navy-muted">
+            <div className="inline-block px-2.5 py-1 bg-poab-navy-surface text-poab-gold text-xs uppercase tracking-wider mb-4 border border-poab-navy-muted backdrop-blur-xs">
               Our Portfolio
             </div>
             <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-6">

@@ -30,12 +30,12 @@ export function ConstructionPhilosophy() {
               &ldquo;A building is only as reliable as the supervision protecting its foundation. Our priority is building structures that stand the test of time.&rdquo;
             </div>
 
-            {/* Illustrative Sub-Structure Detail */}
+            {/* Authentic POAB Foundation Team Work */}
             <div className="border border-poab-grey-border bg-white overflow-hidden shadow-xs">
-              <div className="relative aspect-[16/10] w-full">
+              <div className="relative aspect-[4/3] w-full bg-poab-navy">
                 <Image
-                  src="/images/illustrative/nigeria-foundation-work.jpg"
-                  alt="Construction workers laying foundation blocks outdoors at an active building site"
+                  src="/images/projects/ibadan-workers.jpg"
+                  alt="POAB Global Construction site workers setting deep foundation alignment on an active project in Ibadan, Oyo State"
                   fill
                   className="object-cover object-center"
                   sizes="(max-width: 1024px) 100vw, 40vw"
@@ -43,7 +43,7 @@ export function ConstructionPhilosophy() {
               </div>
               <div className="px-3.5 py-2 bg-poab-stone-light border-t border-poab-grey-border text-[11px] font-mono uppercase tracking-wider text-poab-charcoal/70 flex items-center justify-between">
                 <span>Sub-Structure Standards</span>
-                <span className="text-poab-navy/60">Foundation Blockwork Setting</span>
+                <span className="text-poab-navy/70">Ibadan Foundation Work</span>
               </div>
             </div>
           </div>

@@ -16,11 +16,28 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <div className="bg-white">
-      {/* Page Header */}
-      <section className="bg-poab-navy text-white py-16 sm:py-24 border-b border-poab-navy-surface">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Page Header with Atmospheric Construction Backdrop */}
+      <section className="relative bg-poab-navy text-white py-16 sm:py-24 border-b border-poab-navy-surface overflow-hidden">
+        {/* Subtle Background Pattern */}
+        <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
+
+        {/* Atmospheric Nigerian Construction Work Backdrop */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <Image
+            src="/images/illustrative/kaduna-active-construction.jpg"
+            alt="Active building construction site engineering in Nigeria"
+            fill
+            priority
+            className="object-cover object-[center_25%] opacity-45 md:opacity-50 scale-102"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-poab-navy via-poab-navy/90 to-poab-navy/55" />
+          <div className="absolute inset-0 bg-gradient-to-t from-poab-navy via-poab-navy/30 to-poab-navy/60" />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 bg-poab-navy-surface text-poab-gold text-xs uppercase tracking-wider mb-4 border border-poab-navy-muted">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 bg-poab-navy-surface text-poab-gold text-xs uppercase tracking-wider mb-4 border border-poab-navy-muted backdrop-blur-xs">
               <ShieldCheck className="w-4 h-4 text-poab-gold" />
               <span>Incorporated in Nigeria • {COMPANY_INFO.rcNumber}</span>
             </div>
@@ -70,7 +87,7 @@ export default function AboutPage() {
               </p>
             </div>
 
-            {/* Quick Fact Sheet & Illustrative Process Column */}
+            {/* Quick Fact Sheet & Genuine Project Column */}
             <div className="lg:col-span-5 space-y-6">
               <div className="bg-poab-stone-light p-8 border border-poab-grey-border">
                 <h3 className="font-heading text-lg font-bold text-poab-navy uppercase tracking-wider border-b border-poab-grey-border pb-4 mb-6">
@@ -134,20 +151,20 @@ export default function AboutPage() {
                 </div>
               </div>
 
-              {/* Illustrative Process Photography */}
+              {/* Genuine POAB Construction Site Photography */}
               <div className="border border-poab-grey-border bg-white overflow-hidden shadow-xs">
-                <div className="relative aspect-[4/3] w-full">
+                <div className="relative aspect-[4/3] w-full bg-poab-navy">
                   <Image
-                    src="/images/illustrative/kaduna-active-construction.jpg"
-                    alt="Construction workers on site handling structural masonry and blockwork"
+                    src="/images/projects/ogun-decking.jpg"
+                    alt="POAB Global Construction site engineering team executing decking reinforcement on an ongoing Ogun State project"
                     fill
                     className="object-cover object-center"
                     sizes="(max-width: 1024px) 100vw, 40vw"
                   />
                 </div>
                 <div className="px-4 py-2.5 bg-poab-stone-light border-t border-poab-grey-border text-[11px] font-mono uppercase tracking-wider text-poab-charcoal/70 flex items-center justify-between">
-                  <span>Site Engineering</span>
-                  <span className="text-poab-navy/60">Active Structural Masonry</span>
+                  <span>Site Proof</span>
+                  <span className="text-poab-navy/70">Ogun Project Decking Phase</span>
                 </div>
               </div>
             </div>

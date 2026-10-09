@@ -3,6 +3,7 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { CredibilityStrip } from "@/components/home/CredibilityStrip";
 import { WhatWeBuild } from "@/components/home/WhatWeBuild";
 import { FoundationToFinish } from "@/components/home/FoundationToFinish";
+import { MeetOurFounder } from "@/components/home/MeetOurFounder";
 import { SelectedProjects } from "@/components/home/SelectedProjects";
 import { ConstructionPhilosophy } from "@/components/home/ConstructionPhilosophy";
 import { HowWeWork } from "@/components/home/HowWeWork";
@@ -43,6 +44,7 @@ export default async function HomePage() {
       <CredibilityStrip />
       <WhatWeBuild />
       <FoundationToFinish />
+      <MeetOurFounder />
       <SelectedProjects projects={featuredProjects} />
       <ConstructionPhilosophy />
       <HowWeWork />
@@ -51,3 +53,4 @@ export default async function HomePage() {
     </div>
   );
 }
+
