@@ -12,6 +12,7 @@ import {
   Save,
   CheckCircle2,
   AlertCircle,
+  Download,
 } from "lucide-react";
 import { SellPropertyRequest, SellPropertyAttachment, SellRequestStatus } from "@/types/database";
 import { Textarea } from "@/components/ui/Input";
@@ -64,12 +65,32 @@ export function SellRequestDetailClient({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to update sell request");
 
-      setStatusMessage("Seller status & verification notes saved.");
+      setStatusMessage("Status and notes saved successfully.");
       router.refresh();
     } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : "Error saving");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  const handleDownloadAttachment = async (attachmentId: string) => {
+    try {
+      setDownloadingId(attachmentId);
+      const res = await fetch(
+        `/api/admin/attachments?type=sell&recordId=${request.id}&attachmentId=${attachmentId}`
+      );
+      const data = await res.json();
+      if (!res.ok || !data.url) {
+        throw new Error(data.error || "Failed to get download link");
+      }
+      window.open(data.url, "_blank", "noopener,noreferrer");
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Error downloading file");
+    } finally {
+      setDownloadingId(null);
     }
   };
 
@@ -100,7 +121,7 @@ export function SellRequestDetailClient({
               </span>
             </div>
             <h2 className="font-heading text-xl font-bold text-poab-navy">
-              Seller: {request.seller_name}
+              Property Sale Request: {request.seller_name}
             </h2>
           </div>
         </div>
@@ -154,7 +175,7 @@ export function SellRequestDetailClient({
         <div className="lg:col-span-7 space-y-6">
           <div className="bg-white border border-poab-grey-border p-6 shadow-xs space-y-4">
             <h3 className="font-heading text-sm font-bold text-poab-navy uppercase tracking-wider border-b border-poab-grey-border pb-3">
-              Property Specification
+              Property Details
             </h3>
 
             <div className="grid grid-cols-2 gap-4 text-xs">
@@ -183,7 +204,7 @@ export function SellRequestDetailClient({
 
             <div className="pt-2 border-t border-poab-grey-border text-xs">
               <span className="text-[10px] uppercase tracking-wider text-poab-charcoal/60 block font-semibold mb-1">
-                Seller Description &amp; Title Particulars
+                Property Description &amp; Details
               </span>
               <p className="font-light text-poab-charcoal leading-relaxed whitespace-pre-line bg-poab-stone-light/50 p-3 border border-poab-grey-border">
                 {request.description}
@@ -194,7 +215,7 @@ export function SellRequestDetailClient({
           {/* Attachments */}
           <div className="bg-white border border-poab-grey-border p-6 shadow-xs space-y-4">
             <h3 className="font-heading text-sm font-bold text-poab-navy uppercase tracking-wider border-b border-poab-grey-border pb-3 flex items-center justify-between">
-              <span>Attached Title Deeds &amp; Photos</span>
+              <span>Attached Documents &amp; Photos</span>
               <span className="font-mono text-xs text-poab-gold">{attachments.length}</span>
             </h3>
 
@@ -205,19 +226,31 @@ export function SellRequestDetailClient({
                     key={att.id}
                     className="p-3 bg-poab-stone-light border border-poab-grey-border flex items-center justify-between text-xs"
                   >
-                    <div className="flex items-center space-x-2 truncate max-w-sm">
+                    <div className="flex items-center space-x-2 truncate max-w-xs sm:max-w-sm">
                       <FileText className="w-4 h-4 text-poab-navy flex-shrink-0" />
                       <span className="font-medium text-poab-navy truncate">{att.file_name}</span>
                     </div>
-                    <span className="text-[11px] font-mono text-poab-charcoal/60">
-                      {(att.file_size / 1024 / 1024).toFixed(2)} MB
-                    </span>
+                    <div className="flex items-center space-x-3">
+                      <span className="text-[11px] font-mono text-poab-charcoal/60">
+                        {(att.file_size / 1024 / 1024).toFixed(2)} MB
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleDownloadAttachment(att.id)}
+                        disabled={downloadingId === att.id}
+                        className="px-2.5 py-1 bg-white border border-poab-grey-border hover:bg-poab-stone text-poab-navy font-semibold text-[11px] flex items-center space-x-1"
+                        title="Download or view secure document"
+                      >
+                        <Download className="w-3.5 h-3.5 text-poab-gold" />
+                        <span>{downloadingId === att.id ? "Loading..." : "View / Download"}</span>
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
               <p className="text-xs text-poab-charcoal/60 font-light">
-                No external deed files attached with this seller submission.
+                No documents or photos were attached to this request.
               </p>
             )}
           </div>
@@ -230,17 +263,16 @@ export function SellRequestDetailClient({
             className="bg-white border border-poab-grey-border p-6 shadow-xs space-y-4"
           >
             <h3 className="font-heading text-sm font-bold text-poab-navy uppercase tracking-wider border-b border-poab-grey-border pb-2">
-              Review Status &amp; Audit Notes
+              Review Status &amp; Internal Notes
             </h3>
 
-            {/* Workflow Warning (Section 23 & 33) */}
             <div className="p-3 bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-normal">
-              <strong>Audit Policy:</strong> Marking status as &ldquo;Accepted&rdquo; documents approval for representation. It does <em>not</em> automatically publish a listing to the public website.
+              <strong>Representation Note:</strong> Accepting this request confirms POAB will represent the property. It does <em>not</em> automatically publish a listing to the public website.
             </div>
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-poab-navy mb-1.5">
-                Current Status
+                Status
               </label>
               <select
                 value={status}
@@ -256,11 +288,11 @@ export function SellRequestDetailClient({
             </div>
 
             <Textarea
-              label="Title Audit &amp; Beacon Verification Notes"
+              label="Property Verification &amp; Valuation Notes"
               rows={5}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Record survey beacon verification, registry search results, valuation, or seller agreement terms..."
+              placeholder="Record survey verification, registry search results, valuation, or seller agreement terms..."
             />
 
             <Button
@@ -270,7 +302,7 @@ export function SellRequestDetailClient({
               isLoading={isLoading}
             >
               <Save className="w-4 h-4 mr-1.5" />
-              <span>Save Seller Record</span>
+              <span>Save Status &amp; Notes</span>
             </Button>
           </form>
         </div>

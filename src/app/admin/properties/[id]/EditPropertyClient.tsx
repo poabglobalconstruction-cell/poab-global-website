@@ -1,25 +1,29 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, Archive, Trash2, CheckCircle2, AlertCircle, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Save, Archive, Trash2, CheckCircle2, AlertCircle, AlertTriangle, Images, Star } from "lucide-react";
 import { Property, PropertyImage } from "@/types/database";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { DeleteConfirmationModal } from "@/components/admin/DeleteConfirmationModal";
+import { AdminImageUploader } from "@/components/admin/AdminImageUploader";
 
 interface EditPropertyClientProps {
   initialProperty: Property;
-  initialImages: PropertyImage[];
+  initialImages?: PropertyImage[];
 }
 
-export function EditPropertyClient({ initialProperty }: EditPropertyClientProps) {
+export function EditPropertyClient({ initialProperty, initialImages = [] }: EditPropertyClientProps) {
   const router = useRouter();
+  const errorRef = useRef<HTMLDivElement>(null);
+
   const [property, setProperty] = useState({
     ...initialProperty,
     featuresText: initialProperty.features?.join("\n") || "",
   });
+  const [images, setImages] = useState<PropertyImage[]>(initialImages);
 
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -30,6 +34,14 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(null);
 
+  const scrollToError = () => {
+    setTimeout(() => {
+      if (errorRef.current) {
+        errorRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 50);
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -38,7 +50,7 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
 
     try {
       const featuresArray = property.featuresText
-        ? property.featuresText.split("\n").map((f) => f.trim()).filter(Boolean)
+        ? property.featuresText.split(/[\n,]/).map((f) => f.trim()).filter(Boolean)
         : [];
 
       const res = await fetch("/api/admin/properties", {
@@ -47,6 +59,7 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
         body: JSON.stringify({
           ...property,
           features: featuresArray,
+          images,
         }),
       });
 
@@ -56,10 +69,11 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
       if (property.published) {
         setProperty((prev) => ({ ...prev, archived_at: null }));
       }
-      setStatusMessage("Property details updated successfully.");
+      setStatusMessage("Property details and gallery photographs updated successfully.");
       router.refresh();
     } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : "Error updating property");
+      scrollToError();
     } finally {
       setIsLoading(false);
     }
@@ -85,6 +99,7 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
       router.refresh();
     } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : "Error archiving");
+      scrollToError();
     } finally {
       setIsLoading(false);
     }
@@ -107,6 +122,7 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
       router.refresh();
     } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : "Error restoring property");
+      scrollToError();
     } finally {
       setIsLoading(false);
     }
@@ -132,6 +148,34 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const handleAddImage = (storagePath: string, publicUrl: string) => {
+    const isFirst = images.length === 0;
+    const newImg: PropertyImage = {
+      id: crypto.randomUUID(),
+      property_id: property.id,
+      storage_path: publicUrl,
+      alt_text: property.title,
+      sort_order: images.length,
+      is_primary: isFirst,
+      created_at: new Date().toISOString(),
+    };
+    setImages([...images, newImg]);
+    setStatusMessage("Photo added. Click 'Save Changes' to save your updates.");
+  };
+
+  const removeImage = (id: string) => {
+    setImages(images.filter((img) => img.id !== id));
+  };
+
+  const setPrimaryImage = (id: string) => {
+    setImages(
+      images.map((img) => ({
+        ...img,
+        is_primary: img.id === id,
+      }))
+    );
   };
 
   return (
@@ -208,7 +252,11 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
       )}
 
       {errorMessage && (
-        <div className="p-4 bg-red-50 border border-red-200 text-xs text-red-700 flex items-center space-x-2">
+        <div
+          ref={errorRef}
+          role="alert"
+          className="p-4 bg-red-50 border border-red-200 text-xs text-red-700 flex items-center space-x-2"
+        >
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{errorMessage}</span>
         </div>
@@ -223,7 +271,7 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
             onChange={(e) => setProperty({ ...property, title: e.target.value })}
           />
           <Input
-            label="URL Slug"
+            label="Page Address (URL)"
             required
             value={property.slug}
             onChange={(e) => setProperty({ ...property, slug: e.target.value })}
@@ -257,7 +305,7 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
 
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-poab-navy mb-1.5">
-              Status (Section 30)
+              Listing Status
             </label>
             <select
               value={property.status}
@@ -266,7 +314,7 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
             >
               <option value="Available">Available</option>
               <option value="Under Offer">Under Offer</option>
-              <option value="Sold">Sold (Marks SOLD on Site)</option>
+              <option value="Sold">Sold</option>
             </select>
           </div>
         </div>
@@ -309,11 +357,79 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
         />
 
         <Textarea
-          label="Confirmed Features (One per line)"
+          label="Confirmed Features (One per line or comma-separated)"
           rows={3}
           value={property.featuresText}
           onChange={(e) => setProperty({ ...property, featuresText: e.target.value })}
         />
+
+        {/* Property Photos & Gallery Manager */}
+        <div className="p-6 bg-poab-stone-light/40 border border-poab-grey-border space-y-4">
+          <div className="flex items-center justify-between border-b border-poab-grey-border pb-3">
+            <div className="flex items-center space-x-2">
+              <Images className="w-5 h-5 text-poab-gold" />
+              <h3 className="font-heading text-xs font-bold text-poab-navy uppercase tracking-wider">
+                Property Photos
+              </h3>
+            </div>
+            <span className="text-xs font-mono text-poab-gold font-bold">
+              {images.length} Photos
+            </span>
+          </div>
+
+          {images.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {images.map((img) => (
+                <div
+                  key={img.id}
+                  className="relative group bg-white border border-poab-grey-border p-1 space-y-1 text-xs"
+                >
+                  <div className="w-full h-24 bg-poab-stone overflow-hidden relative">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={img.storage_path}
+                      alt={img.alt_text}
+                      className="w-full h-full object-cover"
+                    />
+                    {img.is_primary && (
+                      <span className="absolute top-1 left-1 px-1.5 py-0.5 bg-poab-gold text-poab-navy text-[9px] font-bold uppercase tracking-wider flex items-center space-x-0.5">
+                        <Star className="w-2.5 h-2.5 fill-poab-navy" />
+                        <span>Cover</span>
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between pt-1">
+                    {!img.is_primary && (
+                      <button
+                        type="button"
+                        onClick={() => setPrimaryImage(img.id)}
+                        className="text-[10px] text-poab-navy hover:text-poab-gold font-semibold uppercase tracking-wider"
+                      >
+                        Set as Cover Photo
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeImage(img.id)}
+                      className="text-red-700 hover:text-red-900 ml-auto p-0.5"
+                      title="Remove photograph"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <AdminImageUploader
+            bucket="property-images"
+            folder={`listings/${property.reference}`}
+            label="Add Property Photo"
+            helperText="Select photos from your mobile phone or computer. The cover photo is displayed on listing cards."
+            onUploadComplete={(path, url) => handleAddImage(path, url)}
+          />
+        </div>
 
         <div className="p-4 bg-poab-stone-light border border-poab-grey-border flex flex-wrap gap-8 text-xs font-semibold uppercase text-poab-navy">
           <label className="flex items-center space-x-2.5 cursor-pointer">
@@ -323,7 +439,7 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
               onChange={(e) => setProperty({ ...property, price_public: e.target.checked })}
               className="accent-poab-navy w-4 h-4"
             />
-            <span>Display Price Publicly</span>
+            <span>Show Price Publicly</span>
           </label>
 
           <label className="flex items-center space-x-2.5 cursor-pointer">
@@ -333,7 +449,7 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
               onChange={(e) => setProperty({ ...property, published: e.target.checked })}
               className="accent-poab-navy w-4 h-4"
             />
-            <span>Published (Visible to Public)</span>
+            <span>Visible on Website</span>
           </label>
 
           <label className="flex items-center space-x-2.5 cursor-pointer">
@@ -343,7 +459,7 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
               onChange={(e) => setProperty({ ...property, featured: e.target.checked })}
               className="accent-poab-gold w-4 h-4"
             />
-            <span>Featured Listing</span>
+            <span>Feature on Homepage</span>
           </label>
         </div>
 
@@ -364,7 +480,7 @@ export function EditPropertyClient({ initialProperty }: EditPropertyClientProps)
           </h3>
         </div>
         <p className="text-xs text-poab-charcoal/80 font-light leading-relaxed max-w-2xl">
-          Permanently delete this property listing and its uploaded property images from the database and storage. This cannot be undone. To retain historical listing and sales records without public display, use <strong>Archive Property</strong> above instead.
+          Permanently delete this property listing and all uploaded photographs. Any customer enquiries received for this property will be preserved in administration records. This action cannot be undone. If you only want to hide it from visitors, set it to Draft or use Archive Property instead.
         </p>
         <div className="pt-2">
           <Button

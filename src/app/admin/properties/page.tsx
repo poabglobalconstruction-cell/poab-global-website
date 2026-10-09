@@ -47,10 +47,10 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 border border-poab-grey-border">
         <div>
           <h2 className="font-heading text-lg font-bold text-poab-navy uppercase tracking-wider">
-            Properties &amp; Listings Management
+            Property Listings
           </h2>
           <p className="text-xs text-poab-charcoal/70 mt-1 font-light">
-            Manage public listings, pricing visibility, and sale statuses (Available, Under Offer, Sold).
+            Manage properties for sale, pricing display, and listing statuses.
           </p>
         </div>
 
@@ -74,7 +74,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                   <th className="p-4">Location</th>
                   <th className="p-4">Asking Price</th>
                   <th className="p-4">Listing Status</th>
-                  <th className="p-4">Visibility</th>
+                  <th className="p-4">Website Visibility</th>
                   <th className="p-4 text-right">Actions</th>
                 </tr>
               </thead>
@@ -111,10 +111,10 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                       ) : prop.published ? (
                         <span className="text-emerald-700 font-semibold text-[10px] uppercase flex items-center space-x-1">
                           <CheckCircle2 className="w-3 h-3" />
-                          <span>Published</span>
+                          <span>Visible</span>
                         </span>
                       ) : (
-                        <span className="text-amber-700 font-semibold text-[10px] uppercase">Draft</span>
+                        <span className="text-amber-700 font-semibold text-[10px] uppercase">Hidden (Draft)</span>
                       )}
                     </td>
                     <td className="p-4 text-right space-x-2">
@@ -141,7 +141,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
           </div>
         ) : (
           <div className="p-12 text-center text-xs text-poab-charcoal/60 font-light">
-            No properties registered in database. Click &ldquo;Add New Property&rdquo; to list a parcel or home.
+            No properties found. Click &ldquo;Add New Property&rdquo; to create your first listing.
           </div>
         )}
       </div>

@@ -35,10 +35,10 @@ export default async function AdminPropertyEnquiriesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 border border-poab-grey-border">
         <div>
           <h2 className="font-heading text-lg font-bold text-poab-navy uppercase tracking-wider">
-            Property Leads &amp; Enquiries
+            Property Enquiries
           </h2>
           <p className="text-xs text-poab-charcoal/70 mt-1 font-light">
-            Inquiries and inspection bookings tied directly to listed properties.
+            Customer enquiries and inspection requests for listed properties.
           </p>
         </div>
       </div>
@@ -49,13 +49,13 @@ export default async function AdminPropertyEnquiriesPage() {
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="bg-poab-stone-light border-b border-poab-grey-border text-poab-navy uppercase tracking-wider font-mono">
-                  <th className="p-4">Customer Name</th>
-                  <th className="p-4">Target Property</th>
+                  <th className="p-4">Client Name</th>
+                  <th className="p-4">Property</th>
                   <th className="p-4">Phone / Email</th>
                   <th className="p-4">Message Snippet</th>
                   <th className="p-4">Status</th>
                   <th className="p-4">Date</th>
-                  <th className="p-4 text-right">Action</th>
+                  <th className="p-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-poab-grey-border">
@@ -132,7 +132,7 @@ export default async function AdminPropertyEnquiriesPage() {
           </div>
         ) : (
           <div className="p-12 text-center text-xs text-poab-charcoal/60 font-light">
-            No property enquiries logged yet.
+            No property enquiries received yet.
           </div>
         )}
       </div>

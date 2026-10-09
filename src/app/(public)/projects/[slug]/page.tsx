@@ -174,7 +174,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
               <div className="flex items-center space-x-2.5 mb-8">
                 <Layers className="w-5 h-5 text-poab-gold" />
                 <h2 className="font-heading text-xl sm:text-2xl font-bold text-poab-navy">
-                  Stage-by-Stage Construction Log
+                  Construction Progress
                 </h2>
               </div>
 
@@ -224,7 +224,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
             {images.length > 0 && (
               <div className="pt-8 border-t border-poab-grey-border">
                 <h2 className="font-heading text-xl sm:text-2xl font-bold text-poab-navy mb-6">
-                  Additional Site Documentation
+                  Project Photos
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {images.map((img) => (
@@ -280,7 +280,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                 {project.scope && (
                   <div>
                     <span className="block text-[11px] uppercase tracking-wider text-poab-charcoal/60 font-medium">
-                      Declared Scope
+                      Project Scope
                     </span>
                     <span className="font-medium text-poab-charcoal">{project.scope}</span>
                   </div>
@@ -289,7 +289,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                 {project.start_date && (
                   <div>
                     <span className="block text-[11px] uppercase tracking-wider text-poab-charcoal/60 font-medium">
-                      Site Commencement
+                      Commencement Date
                     </span>
                     <span className="font-medium text-poab-charcoal">{formatDate(project.start_date)}</span>
                   </div>

@@ -35,10 +35,10 @@ export default async function AdminSellRequestsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 border border-poab-grey-border">
         <div>
           <h2 className="font-heading text-lg font-bold text-poab-navy uppercase tracking-wider">
-            Seller Intake Queue
+            Property Sale Requests
           </h2>
           <p className="text-xs text-poab-charcoal/70 mt-1 font-light">
-            Confidential seller requests. Acceptance never auto-publishes listings; title inspection is required first.
+            Confidential submissions from property owners wishing to sell land or buildings.
           </p>
         </div>
       </div>
@@ -54,9 +54,9 @@ export default async function AdminSellRequestsPage() {
                   <th className="p-4">Property Type</th>
                   <th className="p-4">Location</th>
                   <th className="p-4">Asking Price</th>
-                  <th className="p-4">Review Status</th>
+                  <th className="p-4">Status</th>
                   <th className="p-4">Date</th>
-                  <th className="p-4 text-right">Action</th>
+                  <th className="p-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-poab-grey-border">
@@ -97,7 +97,7 @@ export default async function AdminSellRequestsPage() {
                         href={`/admin/sell-requests/${req.id}`}
                         className="px-3 py-1 bg-poab-stone text-poab-navy hover:bg-poab-stone-dark text-[11px] font-semibold uppercase tracking-wider inline-block"
                       >
-                        Audit
+                        Review
                       </Link>
                     </td>
                   </tr>
@@ -107,7 +107,7 @@ export default async function AdminSellRequestsPage() {
           </div>
         ) : (
           <div className="p-12 text-center text-xs text-poab-charcoal/60 font-light">
-            No seller property requests logged in database yet.
+            No property sale requests received yet.
           </div>
         )}
       </div>

@@ -5,6 +5,8 @@ import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { getNextReference } from "@/lib/reference";
 import { verifyAdminSession } from "@/lib/supabase/auth";
 
+import { resolveUniqueSlug } from "@/lib/slug";
+
 export async function POST(req: NextRequest) {
   try {
     const session = await verifyAdminSession();
@@ -26,12 +28,12 @@ export async function POST(req: NextRequest) {
 
     const reference = await getNextReference(client, "POAB-PROP");
 
-    const slug =
-      body.slug ||
-      body.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "");
+    // Resolve unique slug safely without manual collision errors
+    const slug = await resolveUniqueSlug(
+      client,
+      "properties",
+      body.slug || body.title
+    );
 
     const { data, error } = await client
       .from("properties")
@@ -80,7 +82,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { id, ...updates } = body;
+    const { id, images, ...updates } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Missing property ID" }, { status: 400 });
@@ -112,6 +114,26 @@ export async function PUT(req: NextRequest) {
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    // Persist property gallery images if provided
+    if (Array.isArray(images)) {
+      await client.from("property_images").delete().eq("property_id", id);
+      if (images.length > 0) {
+        const imagesToInsert = images.map((img, idx) => ({
+          id: img.id && img.id.length === 36 ? img.id : crypto.randomUUID(),
+          property_id: id,
+          storage_path: img.storage_path,
+          alt_text: img.alt_text || "",
+          caption: img.caption || null,
+          sort_order: typeof img.sort_order === "number" ? img.sort_order : idx,
+          is_primary: Boolean(img.is_primary),
+        }));
+        const { error: imgError } = await client.from("property_images").insert(imagesToInsert);
+        if (imgError) {
+          console.error("Error persisting property images:", imgError);
+        }
+      }
     }
 
     revalidatePath("/");

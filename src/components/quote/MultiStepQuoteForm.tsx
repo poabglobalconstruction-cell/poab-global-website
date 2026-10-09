@@ -214,13 +214,13 @@ export function MultiStepQuoteForm({
       <div className="p-8 sm:p-12 bg-white border border-poab-grey-border shadow-xs max-w-2xl mx-auto text-center">
         <CheckCircle2 className="w-16 h-16 text-emerald-600 mx-auto mb-4" />
         <span className="text-xs uppercase tracking-widest text-poab-gold font-bold block mb-1">
-          Submission Confirmed
+          Quotation Request Received
         </span>
         <h2 className="font-heading text-2xl sm:text-3xl font-bold text-poab-navy mb-4">
-          Project Request Logged Successfully
+          Quotation Request Received Successfully
         </h2>
         <p className="text-sm text-poab-charcoal/80 leading-relaxed font-light mb-8 max-w-lg mx-auto">
-          Your construction enquiry has been recorded. Our project team will review your scope and architectural details.
+          Thank you for sharing your project details. Our team will review your request.
         </p>
 
         {/* Human Reference Box */}
@@ -547,7 +547,7 @@ export function MultiStepQuoteForm({
                 Upload Drawings, Site Sketches or Reference Images (Optional)
               </label>
               <p className="text-xs text-poab-charcoal/70 mb-3 font-light">
-                Supported formats: PDF, JPG, PNG (Max 15MB each, up to 5 files). Stored securely in private cloud storage.
+                Supported formats: PDF, JPG, PNG (Maximum 15MB each, up to 5 files).
               </p>
 
               <label className="border-2 border-dashed border-poab-grey-border p-8 block text-center cursor-pointer hover:border-poab-navy/50 transition-colors bg-poab-stone-light/50">

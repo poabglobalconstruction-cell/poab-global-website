@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     if (!supabase && (isProduction || isConfigured)) {
       console.error("[CRITICAL] Supabase client unavailable during property enquiry submission.");
       return NextResponse.json(
-        { error: "Database service is currently unavailable. Please contact us directly at properties@poabglobalconstruction.com." },
+        { error: "Our service is temporarily unavailable. Please contact us directly at properties@poabglobalconstruction.com." },
         { status: 503 }
       );
     }

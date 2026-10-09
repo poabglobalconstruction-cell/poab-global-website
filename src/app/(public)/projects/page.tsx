@@ -7,7 +7,7 @@ import { Project, ProjectType } from "@/types/database";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 
 export const metadata: Metadata = {
-  title: "Projects & Proof of Work",
+  title: "Our Construction Projects",
   description: "Browse construction logs and completed projects executed by POAB Global Construction Company Ltd across Nigeria.",
   alternates: {
     canonical: "/projects",
@@ -59,10 +59,10 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="inline-block px-2.5 py-1 bg-poab-navy-surface text-poab-gold text-xs uppercase tracking-wider mb-4 border border-poab-navy-muted">
-              Documented Site Evidence
+              Our Portfolio
             </div>
             <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-6">
-              Built With Precision. Presented With Proof.
+              Built With Precision. Delivered With Integrity.
             </h1>
             <p className="text-base sm:text-lg text-poab-stone/85 font-light leading-relaxed">
               Explore our project archive documenting stage-by-stage construction execution. We believe honest photography of straight excavation trenches and solid foundation casting speaks louder than promises.

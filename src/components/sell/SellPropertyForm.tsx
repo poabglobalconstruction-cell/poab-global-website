@@ -117,10 +117,10 @@ export function SellPropertyForm() {
       <div className="p-8 sm:p-12 bg-white border border-poab-grey-border shadow-xs max-w-2xl mx-auto text-center">
         <CheckCircle2 className="w-16 h-16 text-emerald-600 mx-auto mb-4" />
         <span className="text-xs uppercase tracking-widest text-poab-gold font-bold block mb-1">
-          Seller Submission Received
+          Property Submission Received
         </span>
         <h2 className="font-heading text-2xl font-bold text-poab-navy mb-4">
-          Property Details Logged for Review
+          Property Submission Received Successfully
         </h2>
         <p className="text-sm text-poab-charcoal/80 leading-relaxed font-light mb-8 max-w-lg mx-auto">
           Thank you for contacting POAB Global Construction. Your property submission has been received. Our team will review your submission before contacting you.
@@ -173,7 +173,7 @@ export function SellPropertyForm() {
 
       {/* Verified Process Notice */}
       <div className="p-4 bg-poab-stone-light border-l-4 border-poab-gold border border-poab-grey-border text-xs text-poab-charcoal/90 leading-relaxed">
-        <strong>Confidential Seller Workflow:</strong> Submitting your property details here initiates an internal review. Your submission will <em>never</em> be automatically published online. An administrator will inspect documentation and contact you directly.
+        <strong>Confidential Review Process:</strong> Submitting your property details allows our team to review title documentation. Your submission will <em>never</em> be published automatically. Our team will verify the details and contact you directly.
       </div>
 
       <div className="space-y-4">

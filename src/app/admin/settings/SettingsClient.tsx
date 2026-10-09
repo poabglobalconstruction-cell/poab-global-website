@@ -77,10 +77,10 @@ export function SettingsClient({ initialContact, initialSocials }: SettingsClien
     <div className="space-y-8 max-w-3xl">
       <div>
         <h2 className="font-heading text-lg font-bold text-poab-navy uppercase tracking-wider">
-          System &amp; Contact Settings
+          Contact &amp; Social Settings
         </h2>
         <p className="text-xs text-poab-charcoal/70 mt-1 font-light">
-          Configure changeable public phone lines, WhatsApp channels, and social media handles.
+          Manage official contact telephone lines, WhatsApp number, email, and social media links.
         </p>
       </div>
 
@@ -98,18 +98,18 @@ export function SettingsClient({ initialContact, initialSocials }: SettingsClien
         </div>
       )}
 
-      {/* Protected Legal Identity Box (Section 34) */}
+      {/* Protected Legal Identity Box */}
       <div className="bg-poab-stone-light p-6 border border-poab-grey-border space-y-3">
         <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-poab-navy">
           <Lock className="w-4 h-4 text-poab-gold" />
-          <span>Protected Corporate Identity (Read-Only)</span>
+          <span>Registered Company Details</span>
         </div>
         <p className="text-xs text-poab-charcoal/70 font-light leading-relaxed">
-          Company legal registration is protected from accidental casual modification.
+          Official company name and CAC registration number as registered with the Corporate Affairs Commission.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-2">
           <div>
-            <span className="text-[10px] uppercase text-poab-charcoal/60 block font-semibold">Corporate Name</span>
+            <span className="text-[10px] uppercase text-poab-charcoal/60 block font-semibold">Company Name</span>
             <span className="font-bold text-poab-navy">{COMPANY_INFO.name}</span>
           </div>
           <div>
@@ -122,24 +122,24 @@ export function SettingsClient({ initialContact, initialSocials }: SettingsClien
       {/* Contact Channels Form */}
       <form onSubmit={handleSaveContact} className="bg-white border border-poab-grey-border p-6 sm:p-8 space-y-6 shadow-xs">
         <h3 className="font-heading text-sm font-bold text-poab-navy uppercase tracking-wider border-b border-poab-grey-border pb-3">
-          1. Public Contact Channels
+          1. Public Contact Details
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
-            label="Official Public Phone"
+            label="Official Telephone Number"
             value={contact.public_phone}
             onChange={(e) => setContact({ ...contact, public_phone: e.target.value })}
             placeholder="e.g., +234 800 000 0000"
-            helperText="Leave empty until genuine official number is supplied."
+            helperText="Displayed publicly across the website."
           />
 
           <Input
-            label="WhatsApp Integration Number"
+            label="WhatsApp Number"
             value={contact.whatsapp_number}
             onChange={(e) => setContact({ ...contact, whatsapp_number: e.target.value })}
             placeholder="e.g., +234 800 000 0000"
-            helperText="Enables direct WhatsApp buttons across quote and property pages."
+            helperText="Enables direct WhatsApp contact for visitors."
           />
         </div>
 
@@ -167,7 +167,7 @@ export function SettingsClient({ initialContact, initialSocials }: SettingsClien
         <div className="flex justify-end pt-2">
           <Button type="submit" variant="primary" size="md" isLoading={isLoading}>
             <Save className="w-4 h-4 mr-1.5" />
-            <span>Save Contact Settings</span>
+            <span>Save Contact Details</span>
           </Button>
         </div>
       </form>
@@ -175,7 +175,7 @@ export function SettingsClient({ initialContact, initialSocials }: SettingsClien
       {/* Social Media Links Form */}
       <form onSubmit={handleSaveSocials} className="bg-white border border-poab-grey-border p-6 sm:p-8 space-y-6 shadow-xs">
         <h3 className="font-heading text-sm font-bold text-poab-navy uppercase tracking-wider border-b border-poab-grey-border pb-3">
-          2. Social Media Handles
+          2. Social Media Links
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

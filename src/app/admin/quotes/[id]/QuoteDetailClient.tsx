@@ -73,6 +73,26 @@ export function QuoteDetailClient({ initialQuote, attachments }: QuoteDetailClie
     }
   };
 
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  const handleDownloadAttachment = async (attachmentId: string) => {
+    try {
+      setDownloadingId(attachmentId);
+      const res = await fetch(
+        `/api/admin/attachments?type=quote&recordId=${quote.id}&attachmentId=${attachmentId}`
+      );
+      const data = await res.json();
+      if (!res.ok || !data.url) {
+        throw new Error(data.error || "Failed to get download link");
+      }
+      window.open(data.url, "_blank", "noopener,noreferrer");
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Error downloading file");
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+
   const cleanPhone = quote.phone.replace(/[^0-9]/g, "");
   const whatsappUrl = buildWhatsAppLink(
     quote.whatsapp || quote.phone,
@@ -106,7 +126,7 @@ export function QuoteDetailClient({ initialQuote, attachments }: QuoteDetailClie
           </div>
         </div>
 
-        {/* Contact Shortcuts (Section 31) */}
+        {/* Contact Shortcuts */}
         <div className="flex items-center space-x-2">
           <a
             href={`tel:${cleanPhone}`}
@@ -162,7 +182,7 @@ export function QuoteDetailClient({ initialQuote, attachments }: QuoteDetailClie
           {/* Specifications Box */}
           <div className="bg-white border border-poab-grey-border p-6 shadow-xs space-y-4">
             <h3 className="font-heading text-sm font-bold text-poab-navy uppercase tracking-wider border-b border-poab-grey-border pb-3">
-              Building Specifications
+              Project Details
             </h3>
 
             <div className="grid grid-cols-2 gap-4 text-xs">
@@ -232,7 +252,7 @@ export function QuoteDetailClient({ initialQuote, attachments }: QuoteDetailClie
                   Building Plan Ready?
                 </span>
                 <span className="font-semibold text-poab-navy">
-                  {quote.has_building_plan ? "Yes (Drawings Uploaded)" : "No (Needs Architectural Support)"}
+                  {quote.has_building_plan ? "Yes (Drawings Provided)" : "No (Architectural Design Needed)"}
                 </span>
               </div>
               {quote.project_inspiration && (
@@ -246,7 +266,7 @@ export function QuoteDetailClient({ initialQuote, attachments }: QuoteDetailClie
             </div>
           </div>
 
-          {/* Secure Attachments Box (Section 31 & 43) */}
+          {/* Attached Documents Box */}
           <div className="bg-white border border-poab-grey-border p-6 shadow-xs space-y-4">
             <h3 className="font-heading text-sm font-bold text-poab-navy uppercase tracking-wider border-b border-poab-grey-border pb-3 flex items-center justify-between">
               <span>Attached Documents &amp; Plans</span>
@@ -260,37 +280,49 @@ export function QuoteDetailClient({ initialQuote, attachments }: QuoteDetailClie
                     key={att.id}
                     className="p-3 bg-poab-stone-light border border-poab-grey-border flex items-center justify-between text-xs"
                   >
-                    <div className="flex items-center space-x-2 truncate max-w-sm">
+                    <div className="flex items-center space-x-2 truncate max-w-xs sm:max-w-sm">
                       <FileText className="w-4 h-4 text-poab-navy flex-shrink-0" />
                       <span className="font-medium text-poab-navy truncate">{att.file_name}</span>
                     </div>
-                    <span className="text-[11px] font-mono text-poab-charcoal/60">
-                      {(att.file_size / 1024 / 1024).toFixed(2)} MB
-                    </span>
+                    <div className="flex items-center space-x-3">
+                      <span className="text-[11px] font-mono text-poab-charcoal/60">
+                        {(att.file_size / 1024 / 1024).toFixed(2)} MB
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleDownloadAttachment(att.id)}
+                        disabled={downloadingId === att.id}
+                        className="px-2.5 py-1 bg-white border border-poab-grey-border hover:bg-poab-stone text-poab-navy font-semibold text-[11px] flex items-center space-x-1"
+                        title="Download or view secure document"
+                      >
+                        <Download className="w-3.5 h-3.5 text-poab-gold" />
+                        <span>{downloadingId === att.id ? "Loading..." : "View / Download"}</span>
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
               <p className="text-xs text-poab-charcoal/60 font-light">
-                No external drawings or attachments were uploaded with this submission.
+                No drawings or documents were attached to this request.
               </p>
             )}
           </div>
         </div>
 
-        {/* Right Column: Workflow Status & Internal Notes */}
+        {/* Right Column: Status & Internal Notes */}
         <div className="lg:col-span-5 space-y-6">
           <form
             onSubmit={handleUpdate}
             className="bg-white border border-poab-grey-border p-6 shadow-xs space-y-6"
           >
             <h3 className="font-heading text-sm font-bold text-poab-navy uppercase tracking-wider border-b border-poab-grey-border pb-3">
-              Lead Workflow &amp; Internal Notes
+              Enquiry Status &amp; Internal Notes
             </h3>
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-poab-navy mb-2">
-                Workflow Status
+                Status
               </label>
               <select
                 value={status}
@@ -306,12 +338,12 @@ export function QuoteDetailClient({ initialQuote, attachments }: QuoteDetailClie
             </div>
 
             <Textarea
-              label="Internal Engineering Notes (Private)"
+              label="Internal Notes"
               rows={6}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Record assessment notes, soil testing results, BOQ cost estimate, client calls, or site meeting schedules..."
-              helperText="Internal notes are never exposed publicly or sent to clients."
+              helperText="Private notes visible only to company staff."
             />
 
             <Button
@@ -321,14 +353,14 @@ export function QuoteDetailClient({ initialQuote, attachments }: QuoteDetailClie
               isLoading={isLoading}
             >
               <Save className="w-4 h-4 mr-1.5" />
-              <span>Update Workflow Record</span>
+              <span>Save Status &amp; Notes</span>
             </Button>
           </form>
 
           {/* Client Contact Profile Box */}
           <div className="bg-poab-stone-light border border-poab-grey-border p-6 space-y-3 text-xs">
             <span className="font-heading font-bold text-poab-navy uppercase tracking-wider block border-b border-poab-grey-border pb-2">
-              Verified Client Contact
+              Client Contact Details
             </span>
             <div>
               <span className="text-[10px] uppercase text-poab-charcoal/60 block font-semibold">Phone</span>

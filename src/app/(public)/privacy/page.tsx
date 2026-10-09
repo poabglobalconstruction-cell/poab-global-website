@@ -45,14 +45,14 @@ export default async function PrivacyPage() {
               2. Information We Collect
             </h2>
             <p>
-              We collect information that you deliberately provide to us through our online workflows, including:
+              We collect information that you deliberately provide to us through our website, including:
             </p>
             <ul className="list-disc pl-5 space-y-1.5 mt-2">
               <li>
                 <strong>Construction Quote Inquiries:</strong> Full name, telephone number, WhatsApp contact, email address, project site location, building scope, target budget selection, and timeline preferences.
               </li>
               <li>
-                <strong>Architectural Plans &amp; Document Uploads:</strong> Architectural drawings, structural plans, site sketches, or photos uploaded through our quote system or seller intake.
+                <strong>Architectural Plans &amp; Document Uploads:</strong> Architectural drawings, structural plans, site sketches, or photos uploaded through our quote form or property sale submission.
               </li>
               <li>
                 <strong>Seller Representation Requests:</strong> Seller name, phone number, email address, property location, title description, asking price, and uploaded survey/title documents.
@@ -76,7 +76,7 @@ export default async function PrivacyPage() {
               <li>To conduct physical site inspections and schedule project assessments.</li>
               <li>To review property ownership documents for seller listings.</li>
               <li>To contact you regarding your submitted inquiries via your preferred method.</li>
-              <li>To maintain internal project records and reference sequence tracking.</li>
+              <li>To maintain project records and enquiry references.</li>
             </ul>
           </section>
 
@@ -85,7 +85,7 @@ export default async function PrivacyPage() {
               4. Storage &amp; Document Security
             </h2>
             <p>
-              All sensitive customer attachments (including architectural building plans and seller deed documents) are stored in private cloud storage protected by authenticated access controls. We do not expose uploaded customer documents via public URLs.
+              All customer attachments (including architectural building plans and property documents) are securely stored and protected by restricted access controls. We do not expose uploaded customer documents on the public website.
             </p>
             <p className="mt-2">
               We never sell, trade, or rent client contact details to external marketing agencies or lead aggregators.

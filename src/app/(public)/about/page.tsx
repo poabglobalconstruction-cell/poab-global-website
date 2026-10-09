@@ -179,7 +179,7 @@ export default function AboutPage() {
                 <div className="flex items-center space-x-2 text-poab-gold mb-3">
                   <CheckCircle2 className="w-5 h-5 text-poab-gold" />
                   <span className="font-mono text-xs font-bold text-poab-navy">
-                    RULE 0{idx + 1}
+                    PRINCIPLE 0{idx + 1}
                   </span>
                 </div>
                 <h3 className="font-heading text-base font-bold text-poab-navy mb-2">

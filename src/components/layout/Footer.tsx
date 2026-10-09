@@ -166,7 +166,7 @@ export async function Footer() {
               href="/admin/login"
               className="hover:text-poab-gold transition-colors text-poab-stone/40"
             >
-              Admin Portal
+              Staff Login
             </Link>
           </div>
         </div>

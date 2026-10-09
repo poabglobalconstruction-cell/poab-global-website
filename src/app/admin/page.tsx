@@ -108,7 +108,7 @@ export default async function AdminDashboardPage() {
       count: data.newSellRequestsCount,
       href: "/admin/sell-requests",
       icon: Tag,
-      badge: "Seller Leads",
+      badge: "Seller Requests",
       badgeColor: "bg-purple-100 text-purple-900",
     },
     {
@@ -116,7 +116,7 @@ export default async function AdminDashboardPage() {
       count: data.activeProjectsCount,
       href: "/admin/projects",
       icon: FolderKanban,
-      badge: "Site Logs",
+      badge: "Active Projects",
       badgeColor: "bg-emerald-100 text-emerald-900",
     },
     {
@@ -138,7 +138,7 @@ export default async function AdminDashboardPage() {
             Site Management Overview
           </h2>
           <p className="text-xs text-poab-charcoal/70 mt-1 font-light">
-            Live database records from public enquiries and site publication logs.
+            Recent activity and customer enquiries from your website.
           </p>
         </div>
 
@@ -148,7 +148,7 @@ export default async function AdminDashboardPage() {
             className="px-4 py-2.5 bg-poab-navy text-white text-xs uppercase tracking-wider font-semibold hover:bg-poab-navy-surface transition-colors flex items-center space-x-1.5"
           >
             <PlusCircle className="w-4 h-4 text-poab-gold" />
-            <span>Add Project</span>
+            <span>Add New Project</span>
           </Link>
 
           <Link
@@ -156,7 +156,7 @@ export default async function AdminDashboardPage() {
             className="px-4 py-2.5 bg-poab-stone text-poab-navy border border-poab-grey-border text-xs uppercase tracking-wider font-semibold hover:bg-poab-stone-dark transition-colors flex items-center space-x-1.5"
           >
             <PlusCircle className="w-4 h-4 text-poab-gold" />
-            <span>Add Property</span>
+            <span>Add New Property</span>
           </Link>
         </div>
       </div>
@@ -186,7 +186,7 @@ export default async function AdminDashboardPage() {
                 </span>
               </div>
               <div className="mt-4 pt-3 border-t border-poab-grey-border text-[11px] text-poab-charcoal/60 flex items-center justify-between">
-                <span>View records</span>
+                <span>View all</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>
@@ -236,7 +236,7 @@ export default async function AdminDashboardPage() {
             </div>
           ) : (
             <div className="py-8 text-center text-xs text-poab-charcoal/60 font-light">
-              No quote requests logged in database yet.
+              No quote requests received yet.
             </div>
           )}
         </div>
@@ -278,7 +278,7 @@ export default async function AdminDashboardPage() {
             </div>
           ) : (
             <div className="py-8 text-center text-xs text-poab-charcoal/60 font-light">
-              No property enquiries recorded yet.
+              No property enquiries received yet.
             </div>
           )}
         </div>

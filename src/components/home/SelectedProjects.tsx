@@ -17,10 +17,10 @@ export function SelectedProjects({ projects }: SelectedProjectsProps) {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
           <div>
             <div className="inline-block px-2.5 py-1 bg-poab-stone text-poab-navy text-xs font-semibold uppercase tracking-wider mb-3">
-              Construction Proof
+              Featured Work
             </div>
             <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-poab-navy tracking-tight">
-              Selected Site Projects
+              Featured Construction Projects
             </h2>
             <p className="mt-2 text-sm text-poab-charcoal/80 font-light max-w-xl">
               {hasProjects

@@ -263,10 +263,10 @@ export function ContactClient({ contact }: ContactClientProps) {
                 <div className="p-8 bg-emerald-50 border border-emerald-200 text-center">
                   <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto mb-3" />
                   <h3 className="font-heading text-lg font-bold text-emerald-950">
-                    Message Dispatched Successfully
+                    Thank You — Your Message Has Been Sent
                   </h3>
                   <p className="text-xs sm:text-sm text-emerald-800 font-light mt-2 max-w-md mx-auto">
-                    Thank you for contacting POAB Global Construction Company Ltd. Your enquiry has been received and routed to our team.
+                    Thank you for contacting POAB Global Construction Company Ltd. Our team will review your message and get in touch with you.
                   </p>
                 </div>
               ) : (

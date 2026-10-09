@@ -24,7 +24,7 @@ export default function AdminLoginPage() {
       const supabase = createClient();
       if (!supabase) {
         throw new Error(
-          "Supabase environment variables are pending configuration. Please see README for bootstrap instructions."
+          "Website service is currently unavailable. Please contact technical support."
         );
       }
 
@@ -38,7 +38,7 @@ export default function AdminLoginPage() {
         throw new Error(authError?.message || "Invalid email or password credentials.");
       }
 
-      // 2. Verify active admin profile (Section 27: Authenticated alone is NOT enough)
+      // 2. Verify active admin profile (Authenticated alone is NOT enough)
       const { data: profile, error: profileError } = await supabase
         .from("admin_profiles")
         .select("id, role, active")
@@ -50,7 +50,7 @@ export default function AdminLoginPage() {
       if (profileError || !profile) {
         await supabase.auth.signOut();
         throw new Error(
-          "Access Denied: This account is authenticated but does not possess an active administrator profile."
+          "Access Denied: This account does not have active administrator privileges."
         );
       }
 
@@ -80,7 +80,7 @@ export default function AdminLoginPage() {
             POAB GLOBAL
           </span>
           <span className="text-[10px] text-poab-gold uppercase tracking-widest font-semibold block">
-            Administrative Management Portal
+            POAB Administration
           </span>
         </div>
 
@@ -118,7 +118,7 @@ export default function AdminLoginPage() {
               isLoading={isLoading}
             >
               <Lock className="w-3.5 h-3.5 mr-2 text-poab-gold" />
-              <span>Sign In to Dashboard</span>
+              <span>Sign In to Administration</span>
             </Button>
           </div>
         </form>
@@ -129,11 +129,11 @@ export default function AdminLoginPage() {
             className="hover:text-poab-navy flex items-center space-x-1"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Return to Site</span>
+            <span>Return to Website</span>
           </Link>
           <span className="flex items-center space-x-1">
             <ShieldCheck className="w-3.5 h-3.5 text-poab-gold" />
-            <span>RBAC Protected</span>
+            <span>Secure Administrator Access</span>
           </span>
         </div>
       </div>

@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { verifyAdminSession } from "@/lib/supabase/auth";
 
 export async function PUT(req: NextRequest) {
   try {
+    const session = await verifyAdminSession();
+    if (!session || !["admin", "super_admin"].includes(session.role)) {
+      return NextResponse.json(
+        { error: "Unauthorized: Active administrator privileges required" },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
     const { id, status, internal_notes } = body;
 

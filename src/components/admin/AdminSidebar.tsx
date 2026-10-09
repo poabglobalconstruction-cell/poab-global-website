@@ -62,7 +62,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
               </span>
             </div>
             <span className="text-[10px] text-poab-stone/60 uppercase tracking-widest block font-mono">
-              Management Portal V1
+              POAB Administration
             </span>
           </Link>
 

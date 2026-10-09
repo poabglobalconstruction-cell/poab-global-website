@@ -110,9 +110,15 @@ export function DeleteConfirmationModal({
           <div className="p-3 bg-poab-stone-light border border-poab-grey-border font-medium text-poab-navy break-words">
             {itemName}
           </div>
-          <p>
-            This action will permanently purge this record, its associated child content, and all uploaded image files from Supabase Storage.
-          </p>
+          {itemType === "Project" ? (
+            <p>
+              This action will permanently delete this project, all associated construction progress updates, and uploaded photographs from the website.
+            </p>
+          ) : (
+            <p>
+              This action will permanently delete this property listing and all uploaded photographs from the website. Any customer enquiry records are safely preserved in your administrative archives.
+            </p>
+          )}
           <div className="p-3 bg-amber-50 border-l-2 border-amber-500 text-amber-900 text-[11px]">
             <strong>Need to keep historical records?</strong> Use <strong>Archive</strong> instead to remove it from public view while preserving business history.
           </div>

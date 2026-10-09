@@ -134,7 +134,7 @@ export function EnquiryDetailClient({ enquiry }: { enquiry: PropertyEnquiry }) {
             <div className="bg-poab-stone-light p-6 border border-poab-grey-border space-y-3 text-xs">
               <div className="flex items-center justify-between">
                 <span className="font-mono text-poab-gold font-bold uppercase tracking-wider">
-                  Target Property • REF: {linkedProperty.reference}
+                  Property Details • REF: {linkedProperty.reference}
                 </span>
                 <span className="px-2 py-0.5 bg-poab-stone text-poab-navy font-semibold uppercase text-[10px]">
                   {linkedProperty.status}
@@ -158,7 +158,7 @@ export function EnquiryDetailClient({ enquiry }: { enquiry: PropertyEnquiry }) {
                   href={`/admin/properties/${linkedProperty.id}`}
                   className="text-xs text-poab-navy font-semibold hover:text-poab-gold inline-flex items-center space-x-1"
                 >
-                  <span>✎ Manage Property in Admin</span>
+                  <span>✎ Manage Property</span>
                 </Link>
               </div>
             </div>
@@ -166,7 +166,7 @@ export function EnquiryDetailClient({ enquiry }: { enquiry: PropertyEnquiry }) {
             <div className="bg-poab-stone-light p-6 border border-poab-grey-border space-y-3 text-xs">
               <div className="flex items-center justify-between">
                 <span className="font-mono text-poab-charcoal/70 font-bold uppercase tracking-wider">
-                  Target Property • {enquiry.property_reference ? `REF: ${enquiry.property_reference}` : "Deleted Listing"}
+                  Property Details • {enquiry.property_reference ? `REF: ${enquiry.property_reference}` : "Deleted Listing"}
                 </span>
                 <span className="px-2 py-0.5 bg-red-100 text-red-800 font-semibold uppercase text-[10px] tracking-wider border border-red-200">
                   Listing Deleted
@@ -176,15 +176,15 @@ export function EnquiryDetailClient({ enquiry }: { enquiry: PropertyEnquiry }) {
                 {enquiry.property_title || "Preserved Property Listing"}
               </h3>
               <p className="text-poab-charcoal/70 text-xs leading-relaxed pt-1 border-t border-poab-grey-border">
-                The original property listing associated with this enquiry has been permanently deleted. Lead contact details and enquiry snapshot data are preserved.
+                The original property listing associated with this enquiry has been removed. Client contact details and enquiry records are safely preserved in administration.
               </p>
             </div>
           )}
 
-          {/* Customer Contact Details Panel */}
+          {/* Client Contact Details Panel */}
           <div className="bg-white border border-poab-grey-border p-6 shadow-xs space-y-4 text-xs">
             <span className="font-heading text-xs font-bold text-poab-navy uppercase tracking-wider block border-b border-poab-grey-border pb-2">
-              Customer Contact Details
+              Client Contact Details
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -223,7 +223,7 @@ export function EnquiryDetailClient({ enquiry }: { enquiry: PropertyEnquiry }) {
           {/* Customer Message */}
           <div className="bg-white border border-poab-grey-border p-6 shadow-xs space-y-3 text-xs">
             <span className="font-heading text-xs font-bold text-poab-navy uppercase tracking-wider block border-b border-poab-grey-border pb-2">
-              Customer Message
+              Enquiry Message
             </span>
             <p className="text-sm font-light text-poab-charcoal leading-relaxed whitespace-pre-line">
               {enquiry.message}
@@ -238,12 +238,12 @@ export function EnquiryDetailClient({ enquiry }: { enquiry: PropertyEnquiry }) {
             className="bg-white border border-poab-grey-border p-6 shadow-xs space-y-4"
           >
             <h3 className="font-heading text-sm font-bold text-poab-navy uppercase tracking-wider border-b border-poab-grey-border pb-2">
-              Lead Workflow Status
+              Enquiry Status &amp; Internal Notes
             </h3>
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-poab-navy mb-1.5">
-                Current Status
+                Status
               </label>
               <select
                 value={status}
@@ -259,7 +259,7 @@ export function EnquiryDetailClient({ enquiry }: { enquiry: PropertyEnquiry }) {
             </div>
 
             <Textarea
-              label="Internal Inspection Notes"
+              label="Internal Notes"
               rows={4}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -273,7 +273,7 @@ export function EnquiryDetailClient({ enquiry }: { enquiry: PropertyEnquiry }) {
               isLoading={isLoading}
             >
               <Save className="w-4 h-4 mr-1.5" />
-              <span>Save Lead Status</span>
+              <span>Save Status &amp; Notes</span>
             </Button>
           </form>
         </div>

@@ -57,10 +57,10 @@ export default async function AdminQuotesPage({ searchParams }: AdminQuotesPageP
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 border border-poab-grey-border">
         <div>
           <h2 className="font-heading text-lg font-bold text-poab-navy uppercase tracking-wider">
-            Construction Quote Requests
+            Quote Requests
           </h2>
           <p className="text-xs text-poab-charcoal/70 mt-1 font-light">
-            Manage incoming prospective client leads, review attached drawings, and update internal stage notes.
+            Review quotation requests submitted by prospective clients and manage internal notes.
           </p>
         </div>
       </div>

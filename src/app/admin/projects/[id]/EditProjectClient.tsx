@@ -1,23 +1,53 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, Archive, Plus, Trash2, CheckCircle2, AlertCircle, AlertTriangle, Layers } from "lucide-react";
-import { Project, ProjectStage } from "@/types/database";
+import {
+  ArrowLeft,
+  Save,
+  Plus,
+  Trash2,
+  CheckCircle2,
+  AlertCircle,
+  AlertTriangle,
+  Layers,
+  ChevronUp,
+  ChevronDown,
+  Edit2,
+  Check,
+  X,
+  Camera,
+} from "lucide-react";
+import { Project, ProjectStage, ProjectImage } from "@/types/database";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { DeleteConfirmationModal } from "@/components/admin/DeleteConfirmationModal";
+import { AdminImageUploader } from "@/components/admin/AdminImageUploader";
 
 interface EditProjectClientProps {
   initialProject: Project;
   initialStages: ProjectStage[];
+  initialImages?: ProjectImage[];
 }
 
-export function EditProjectClient({ initialProject, initialStages }: EditProjectClientProps) {
+export function EditProjectClient({
+  initialProject,
+  initialStages,
+  initialImages = [],
+}: EditProjectClientProps) {
   const router = useRouter();
+  const errorRef = useRef<HTMLDivElement>(null);
+
   const [project, setProject] = useState(initialProject);
   const [stages, setStages] = useState(initialStages);
+  const [images, setImages] = useState(initialImages);
+
+  // Editing stage state
+  const [editingStageId, setEditingStageId] = useState<string | null>(null);
+  const [editStageTitle, setEditStageTitle] = useState("");
+  const [editStageDesc, setEditStageDesc] = useState("");
+  const [editStageDate, setEditStageDate] = useState("");
 
   // New stage form state
   const [newStageTitle, setNewStageTitle] = useState("");
@@ -33,6 +63,14 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const scrollToError = () => {
+    setTimeout(() => {
+      if (errorRef.current) {
+        errorRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 50);
+  };
+
   const handleProjectSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -44,6 +82,7 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
         ...project,
         ...(project.published ? { archived_at: null } : {}),
         stages,
+        images,
       };
 
       const res = await fetch("/api/admin/projects", {
@@ -58,10 +97,11 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
       if (project.published) {
         setProject((prev) => ({ ...prev, archived_at: null }));
       }
-      setStatusMessage("Project specifications and construction stages saved successfully.");
+      setStatusMessage("Project specifications, timeline stages, and gallery images saved successfully.");
       router.refresh();
     } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : "Error saving project");
+      scrollToError();
     } finally {
       setIsLoading(false);
     }
@@ -87,6 +127,7 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
       router.refresh();
     } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : "Failed to archive project");
+      scrollToError();
     } finally {
       setIsLoading(false);
     }
@@ -106,6 +147,7 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
       router.refresh();
     } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : "Failed to unarchive project");
+      scrollToError();
     } finally {
       setIsLoading(false);
     }
@@ -133,33 +175,94 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
     }
   };
 
-  const handleAddStage = async () => {
+  const handleAddStage = () => {
     if (!newStageTitle.trim()) return;
 
-    try {
-      const newStage: ProjectStage = {
-        id: crypto.randomUUID(),
-        project_id: project.id,
-        title: newStageTitle,
-        description: newStageDesc || null,
-        stage_date: newStageDate || null,
-        sort_order: stages.length,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
+    const newStage: ProjectStage = {
+      id: crypto.randomUUID(),
+      project_id: project.id,
+      title: newStageTitle.trim(),
+      description: newStageDesc.trim() || null,
+      stage_date: newStageDate || null,
+      sort_order: stages.length,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
 
-      setStages([...stages, newStage]);
-      setNewStageTitle("");
-      setNewStageDesc("");
-      setNewStageDate("");
-      setStatusMessage("Stage added to construction log.");
-    } catch {
-      setErrorMessage("Could not append stage.");
-    }
+    setStages([...stages, newStage]);
+    setNewStageTitle("");
+    setNewStageDesc("");
+    setNewStageDate("");
+    setStatusMessage("Stage added to timeline. Click 'Save Changes' to save your updates.");
+  };
+
+  const startEditStage = (stage: ProjectStage) => {
+    setEditingStageId(stage.id);
+    setEditStageTitle(stage.title);
+    setEditStageDesc(stage.description || "");
+    setEditStageDate(stage.stage_date || "");
+  };
+
+  const saveEditStage = (id: string) => {
+    setStages(
+      stages.map((s) =>
+        s.id === id
+          ? {
+              ...s,
+              title: editStageTitle.trim() || s.title,
+              description: editStageDesc.trim() || null,
+              stage_date: editStageDate || null,
+              updated_at: new Date().toISOString(),
+            }
+          : s
+      )
+    );
+    setEditingStageId(null);
+    setStatusMessage("Stage updated. Remember to click 'Save Changes' above.");
+  };
+
+  const cancelEditStage = () => {
+    setEditingStageId(null);
+  };
+
+  const moveStage = (index: number, direction: "up" | "down") => {
+    const newIdx = direction === "up" ? index - 1 : index + 1;
+    if (newIdx < 0 || newIdx >= stages.length) return;
+
+    const updated = [...stages];
+    const temp = updated[index];
+    updated[index] = updated[newIdx];
+    updated[newIdx] = temp;
+
+    const reordered = updated.map((s, idx) => ({ ...s, sort_order: idx }));
+    setStages(reordered);
   };
 
   const removeStage = (id: string) => {
-    setStages(stages.filter((s) => s.id !== id));
+    // Also decouple images from removed stage
+    setImages(images.map((img) => (img.project_stage_id === id ? { ...img, project_stage_id: null } : img)));
+    setStages(stages.filter((s) => s.id !== id).map((s, idx) => ({ ...s, sort_order: idx })));
+  };
+
+  // Gallery photo additions
+  const handleAddGalleryImage = (storagePath: string, publicUrl: string, stageId?: string) => {
+    const newImg: ProjectImage = {
+      id: crypto.randomUUID(),
+      project_id: project.id,
+      project_stage_id: stageId || null,
+      storage_path: publicUrl,
+      alt_text: project.title,
+      caption: null,
+      sort_order: images.length,
+      is_cover: false,
+      created_at: new Date().toISOString(),
+    };
+    setImages([...images, newImg]);
+    setStatusMessage("Photo added to gallery. Click 'Save Changes' to save your updates.");
+  };
+
+  const removeGalleryImage = (id: string) => {
+    setImages(images.filter((img) => img.id !== id));
   };
 
   return (
@@ -234,7 +337,11 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
       )}
 
       {errorMessage && (
-        <div className="p-4 bg-red-50 border border-red-200 text-xs text-red-700 flex items-center space-x-2">
+        <div
+          ref={errorRef}
+          role="alert"
+          className="p-4 bg-red-50 border border-red-200 text-xs text-red-700 flex items-center space-x-2"
+        >
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{errorMessage}</span>
         </div>
@@ -251,7 +358,7 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
           />
 
           <Input
-            label="URL Slug"
+            label="Page Address (URL)"
             required
             value={project.slug}
             onChange={(e) => setProject({ ...project, slug: e.target.value })}
@@ -260,7 +367,7 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Input
-            label="Site Location"
+            label="Project Location"
             required
             value={project.location}
             onChange={(e) => setProject({ ...project, location: e.target.value })}
@@ -284,22 +391,22 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
 
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-poab-navy mb-1.5">
-              Site Status
+              Project Status
             </label>
             <select
               value={project.status}
               onChange={(e) => setProject({ ...project, status: e.target.value as any })}
               className="w-full px-4 py-2.5 bg-white border border-poab-grey-border text-poab-charcoal text-sm"
             >
-              <option value="Ongoing">Ongoing Site</option>
-              <option value="Completed">Completed & Handed Over</option>
-              <option value="Planning">Site Preparation / Setting Out</option>
+              <option value="Ongoing">Ongoing</option>
+              <option value="Completed">Completed</option>
+              <option value="Planning">Planning</option>
             </select>
           </div>
         </div>
 
         <Input
-          label="Declared Scope"
+          label="Project Scope / Building Details"
           value={project.scope || ""}
           onChange={(e) => setProject({ ...project, scope: e.target.value })}
         />
@@ -319,11 +426,18 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
           onChange={(e) => setProject({ ...project, description: e.target.value })}
         />
 
-        <Input
-          label="Cover Image Path / URL"
-          value={project.cover_image_path || ""}
-          onChange={(e) => setProject({ ...project, cover_image_path: e.target.value })}
-        />
+        {/* Direct Cover Image Uploader */}
+        <div className="p-4 bg-poab-stone-light/40 border border-poab-grey-border space-y-3">
+          <AdminImageUploader
+            bucket="project-images"
+            folder="covers"
+            label="Project Cover Photo"
+            helperText="Select a high-quality photograph for the project cover."
+            currentValue={project.cover_image_path || ""}
+            onUploadComplete={(path, url) => setProject((prev) => ({ ...prev, cover_image_path: url }))}
+            onRemove={() => setProject((prev) => ({ ...prev, cover_image_path: "" }))}
+          />
+        </div>
 
         <div className="p-4 bg-poab-stone-light border border-poab-grey-border flex flex-wrap gap-8">
           <label className="flex items-center space-x-2.5 cursor-pointer text-xs font-semibold uppercase text-poab-navy">
@@ -339,7 +453,7 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
               }
               className="accent-poab-navy w-4 h-4"
             />
-            <span>Published (Visible to Public)</span>
+            <span>Visible on Website (Published)</span>
           </label>
 
           <label className="flex items-center space-x-2.5 cursor-pointer text-xs font-semibold uppercase text-poab-navy">
@@ -361,50 +475,177 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
         </div>
       </form>
 
-      {/* Stage Management Section (Section 29) */}
+      {/* Stage Management Section with Inline Editing and Stage Photo Support */}
       <div className="bg-white border border-poab-grey-border p-6 sm:p-8 space-y-6 shadow-xs">
-        <div className="flex items-center space-x-2 pb-4 border-b border-poab-grey-border">
-          <Layers className="w-5 h-5 text-poab-gold" />
-          <h3 className="font-heading text-base font-bold text-poab-navy uppercase tracking-wider">
-            Site Stages &amp; Construction Timeline
-          </h3>
+        <div className="flex items-center justify-between pb-4 border-b border-poab-grey-border">
+          <div className="flex items-center space-x-2">
+            <Layers className="w-5 h-5 text-poab-gold" />
+            <h3 className="font-heading text-base font-bold text-poab-navy uppercase tracking-wider">
+              Construction Progress Updates
+            </h3>
+          </div>
+          <span className="text-xs font-mono text-poab-gold font-bold">
+            {stages.length} Updates
+          </span>
         </div>
 
         {/* Existing Stages List */}
         {stages.length > 0 ? (
-          <div className="space-y-3">
-            {stages.map((stage, idx) => (
-              <div
-                key={stage.id}
-                className="p-4 bg-poab-stone-light border border-poab-grey-border flex items-start justify-between gap-4 text-xs"
-              >
-                <div>
-                  <span className="font-mono text-poab-gold font-bold uppercase tracking-wider">
-                    Stage 0{idx + 1}
-                  </span>
-                  <h4 className="font-bold text-poab-navy text-sm mt-0.5">{stage.title}</h4>
-                  {stage.description && (
-                    <p className="text-poab-charcoal/80 mt-1 font-light">{stage.description}</p>
+          <div className="space-y-4">
+            {stages.map((stage, idx) => {
+              const isEditingThis = editingStageId === stage.id;
+              const stageImages = images.filter((i) => i.project_stage_id === stage.id);
+
+              return (
+                <div
+                  key={stage.id}
+                  className="p-4 bg-poab-stone-light/60 border border-poab-grey-border space-y-3 text-xs"
+                >
+                  {isEditingThis ? (
+                    <div className="space-y-3 bg-white p-4 border border-poab-navy/20">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <Input
+                          label="Stage Title"
+                          value={editStageTitle}
+                          onChange={(e) => setEditStageTitle(e.target.value)}
+                        />
+                        <Input
+                          label="Stage Date"
+                          type="date"
+                          value={editStageDate}
+                          onChange={(e) => setEditStageDate(e.target.value)}
+                        />
+                      </div>
+                      <Textarea
+                        label="Description / Technical Scope"
+                        rows={2}
+                        value={editStageDesc}
+                        onChange={(e) => setEditStageDesc(e.target.value)}
+                      />
+                      <div className="flex items-center justify-end space-x-2 pt-2">
+                        <button
+                          type="button"
+                          onClick={cancelEditStage}
+                          className="px-2.5 py-1 text-xs border border-poab-grey-border hover:bg-poab-stone flex items-center space-x-1"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                          <span>Cancel</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => saveEditStage(stage.id)}
+                          className="px-3 py-1 bg-poab-navy text-white text-xs font-semibold uppercase flex items-center space-x-1"
+                        >
+                          <Check className="w-3.5 h-3.5 text-poab-gold" />
+                          <span>Update Stage</span>
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2">
+                          <span className="font-mono text-poab-gold font-bold uppercase tracking-wider">
+                            Stage 0{idx + 1}
+                          </span>
+                          {stage.stage_date && (
+                            <span className="text-[11px] text-poab-charcoal/60">
+                              • {stage.stage_date}
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="font-bold text-poab-navy text-sm mt-0.5">{stage.title}</h4>
+                        {stage.description && (
+                          <p className="text-poab-charcoal/80 mt-1 font-light leading-relaxed">
+                            {stage.description}
+                          </p>
+                        )}
+
+                        {/* Stage Photos Gallery */}
+                        {stageImages.length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {stageImages.map((img) => (
+                              <div
+                                key={img.id}
+                                className="relative w-16 h-14 bg-poab-stone border border-poab-grey-border group overflow-hidden"
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={img.storage_path}
+                                  alt={img.alt_text}
+                                  className="w-full h-full object-cover"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => removeGalleryImage(img.id)}
+                                  className="absolute inset-0 bg-red-900/80 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                                  title="Remove photo"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex items-center space-x-1.5 flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => moveStage(idx, "up")}
+                          disabled={idx === 0}
+                          className="p-1 hover:bg-poab-stone disabled:opacity-30 text-poab-navy"
+                          title="Move up"
+                        >
+                          <ChevronUp className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveStage(idx, "down")}
+                          disabled={idx === stages.length - 1}
+                          className="p-1 hover:bg-poab-stone disabled:opacity-30 text-poab-navy"
+                          title="Move down"
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => startEditStage(stage)}
+                          className="p-1 text-poab-navy hover:text-poab-gold"
+                          title="Edit stage details"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeStage(stage.id)}
+                          className="p-1 text-red-700 hover:text-red-900"
+                          title="Remove stage"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
                   )}
-                  {stage.stage_date && (
-                    <span className="text-[11px] text-poab-charcoal/60 block mt-1">
-                      Date: {stage.stage_date}
-                    </span>
+
+                  {/* Add Photo to this stage */}
+                  {!isEditingThis && (
+                    <div className="pt-2 border-t border-poab-grey-border/60">
+                      <AdminImageUploader
+                        bucket="project-images"
+                        folder={`stages/${stage.id.slice(0, 8)}`}
+                        label={`Add Progress Photograph for Stage 0${idx + 1}`}
+                        helperText="Select photographs representing work completed in this stage."
+                        onUploadComplete={(path, url) => handleAddGalleryImage(path, url, stage.id)}
+                      />
+                    </div>
                   )}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => removeStage(stage.id)}
-                  className="text-red-700 hover:text-red-900 p-1"
-                  aria-label="Remove stage"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
-          <div className="text-xs text-poab-charcoal/60 py-4 font-light text-center border border-dashed border-poab-grey-border">
+          <div className="text-xs text-poab-charcoal/60 py-6 font-light text-center border border-dashed border-poab-grey-border">
             No stages logged yet. Add your first milestone below.
           </div>
         )}
@@ -412,14 +653,14 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
         {/* Add Stage Form */}
         <div className="pt-4 border-t border-poab-grey-border space-y-4">
           <h4 className="font-heading text-xs font-bold text-poab-navy uppercase tracking-wider">
-            Add Construction Stage
+            Add Progress Stage
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label="Stage Title"
               value={newStageTitle}
               onChange={(e) => setNewStageTitle(e.target.value)}
-              placeholder="e.g., Deep Trench Excavation & Blinding"
+              placeholder="e.g., Foundation & Ground Works"
             />
             <Input
               label="Stage Date (Optional)"
@@ -437,7 +678,7 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
           />
           <Button type="button" variant="secondary" size="sm" onClick={handleAddStage}>
             <Plus className="w-4 h-4 mr-1 text-poab-gold" />
-            <span>Add Stage to Timeline</span>
+            <span>Add Progress Stage</span>
           </Button>
         </div>
       </div>
@@ -451,7 +692,7 @@ export function EditProjectClient({ initialProject, initialStages }: EditProject
           </h3>
         </div>
         <p className="text-xs text-poab-charcoal/80 font-light leading-relaxed max-w-2xl">
-          Permanently delete this project record, construction stages, and uploaded site images from the database and storage. This cannot be undone. To retain business records without public display, use <strong>Archive Project</strong> above instead.
+          Permanently delete this project, its construction progress updates, and all uploaded photographs. This action cannot be undone. If you only want to hide it from visitors, set it to Draft or use Archive Project instead.
         </p>
         <div className="pt-2">
           <Button

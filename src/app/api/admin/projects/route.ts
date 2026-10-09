@@ -4,6 +4,8 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { verifyAdminSession } from "@/lib/supabase/auth";
 
+import { resolveUniqueSlug } from "@/lib/slug";
+
 export async function POST(req: NextRequest) {
   try {
     const session = await verifyAdminSession();
@@ -23,12 +25,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Database client unavailable" }, { status: 500 });
     }
 
-    const slug =
-      body.slug ||
-      body.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "");
+    // Resolve unique slug safely without manual collision errors
+    const slug = await resolveUniqueSlug(
+      client,
+      "projects",
+      body.slug || body.title
+    );
 
     const { data, error } = await client
       .from("projects")
@@ -54,8 +56,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    revalidatePath("/");
-    revalidatePath("/projects");
+    // If an initial construction stage was provided during creation, insert it
+    if (body.initial_stage_title && typeof body.initial_stage_title === "string") {
+      const stageTitle = body.initial_stage_title.trim();
+      if (stageTitle) {
+        await client.from("project_stages").insert({
+          id: crypto.randomUUID(),
+          project_id: data.id,
+          title: stageTitle,
+          description: body.initial_stage_description || null,
+          stage_date: body.initial_stage_date || null,
+          sort_order: 0,
+        });
+      }
+    }
+
+    try {
+      revalidatePath("/");
+      revalidatePath("/projects");
+    } catch {
+      // Revalidation warning in test environments
+    }
 
     return NextResponse.json({ success: true, project: data });
   } catch (err: unknown) {
@@ -75,7 +96,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { id, stages, ...updates } = body;
+    const { id, stages, images, ...updates } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Missing project ID" }, { status: 400 });
@@ -106,21 +127,58 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    // Persist construction stages if provided
+    // Persist construction stages if provided (Safe Upsert & Deletion of removed stages)
     if (Array.isArray(stages)) {
-      await client.from("project_stages").delete().eq("project_id", id);
+      const incomingIds = stages
+        .map((s) => s.id)
+        .filter((id) => id && !id.startsWith("temp-") && id.length === 36);
+
+      // 1. Delete only stages that were removed by the admin
+      if (incomingIds.length > 0) {
+        await client
+          .from("project_stages")
+          .delete()
+          .eq("project_id", id)
+          .not("id", "in", `(${incomingIds.join(",")})`);
+      } else {
+        await client.from("project_stages").delete().eq("project_id", id);
+      }
+
+      // 2. Upsert stages to maintain stability of existing stage IDs
       if (stages.length > 0) {
-        const stagesToInsert = stages.map((s, idx) => ({
+        const stagesToUpsert = stages.map((s, idx) => ({
           id: s.id && !s.id.startsWith("temp-") && s.id.length === 36 ? s.id : crypto.randomUUID(),
           project_id: id,
           title: s.title,
           description: s.description || null,
           stage_date: s.stage_date || null,
           sort_order: typeof s.sort_order === "number" ? s.sort_order : idx,
+          updated_at: new Date().toISOString(),
         }));
-        const { error: stageError } = await client.from("project_stages").insert(stagesToInsert);
+        const { error: stageError } = await client.from("project_stages").upsert(stagesToUpsert);
         if (stageError) {
-          console.error("Error updating project stages:", stageError);
+          console.error("Error upserting project stages:", stageError);
+        }
+      }
+    }
+
+    // Persist project gallery and stage-associated images if provided
+    if (Array.isArray(images)) {
+      await client.from("project_images").delete().eq("project_id", id);
+      if (images.length > 0) {
+        const imagesToInsert = images.map((img, idx) => ({
+          id: img.id && img.id.length === 36 ? img.id : crypto.randomUUID(),
+          project_id: id,
+          project_stage_id: img.project_stage_id || null,
+          storage_path: img.storage_path,
+          alt_text: img.alt_text || "",
+          caption: img.caption || null,
+          sort_order: typeof img.sort_order === "number" ? img.sort_order : idx,
+          is_cover: Boolean(img.is_cover),
+        }));
+        const { error: imgError } = await client.from("project_images").insert(imagesToInsert);
+        if (imgError) {
+          console.error("Error persisting project images:", imgError);
         }
       }
     }

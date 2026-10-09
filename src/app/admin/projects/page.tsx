@@ -48,10 +48,10 @@ export default async function AdminProjectsPage({ searchParams }: AdminProjectsP
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 border border-poab-grey-border">
         <div>
           <h2 className="font-heading text-lg font-bold text-poab-navy uppercase tracking-wider">
-            Projects &amp; Site Logs
+            Construction Projects
           </h2>
           <p className="text-xs text-poab-charcoal/70 mt-1 font-light">
-            Manage public project publication, stage logs, and construction proof photography.
+            Manage construction projects, work progress updates, and project photos.
           </p>
         </div>
 
@@ -73,8 +73,8 @@ export default async function AdminProjectsPage({ searchParams }: AdminProjectsP
                   <th className="p-4">Project Title</th>
                   <th className="p-4">Category</th>
                   <th className="p-4">Location</th>
-                  <th className="p-4">Site Status</th>
-                  <th className="p-4">Visibility</th>
+                  <th className="p-4">Project Status</th>
+                  <th className="p-4">Website Visibility</th>
                   <th className="p-4 text-right">Actions</th>
                 </tr>
               </thead>
@@ -104,7 +104,7 @@ export default async function AdminProjectsPage({ searchParams }: AdminProjectsP
                           {p.featured && <span className="text-poab-gold">★</span>}
                         </span>
                       ) : (
-                        <span className="text-amber-700 font-semibold text-[10px] uppercase">Draft</span>
+                        <span className="text-amber-700 font-semibold text-[10px] uppercase">Hidden (Draft)</span>
                       )}
                     </td>
                     <td className="p-4 text-right space-x-2">
@@ -131,7 +131,7 @@ export default async function AdminProjectsPage({ searchParams }: AdminProjectsP
           </div>
         ) : (
           <div className="p-12 text-center text-xs text-poab-charcoal/60 font-light">
-            No projects in database. Click &ldquo;Add New Project&rdquo; to create the first project log.
+            No projects have been added yet. Click &ldquo;Add New Project&rdquo; to add your first construction project.
           </div>
         )}
       </div>
