@@ -49,13 +49,20 @@ async function getPropertyBySlug(slug: string): Promise<{
       .eq("property_id", property.id)
       .order("sort_order", { ascending: true });
 
+    // Sort images so primary cover is first, then ordered by sort_order
+    const sortedImages = ((imagesData as PropertyImage[]) || []).sort((a, b) => {
+      if (a.is_primary && !b.is_primary) return -1;
+      if (!a.is_primary && b.is_primary) return 1;
+      return (a.sort_order ?? 0) - (b.sort_order ?? 0);
+    });
+
     // Fetch whatsapp from shared contact settings
     const contact = await getPublicContactSettings();
     const whatsappNumber = contact.whatsapp_number || null;
 
     return {
       property,
-      images: (imagesData as PropertyImage[]) || [],
+      images: sortedImages,
       whatsappNumber,
     };
   } catch {
@@ -80,14 +87,14 @@ export async function generateMetadata({ params }: PropertyDetailPageProps): Pro
 
   return {
     title: {
-      absolute: `${property.title} (${property.reference}) | POAB Global Properties`,
+      absolute: `${property.title} | POAB Global Properties`,
     },
     description: property.description.slice(0, 160),
     alternates: {
       canonical: `/properties/${property.slug}`,
     },
     openGraph: {
-      title: `${property.title} (${property.reference}) | POAB Global Properties`,
+      title: `${property.title} | POAB Global Properties`,
       description: property.description.slice(0, 160),
       url: `/properties/${property.slug}`,
       type: "website",
@@ -102,7 +109,7 @@ export async function generateMetadata({ params }: PropertyDetailPageProps): Pro
     },
     twitter: {
       card: "summary_large_image",
-      title: `${property.title} (${property.reference}) | POAB Global Properties`,
+      title: `${property.title} | POAB Global Properties`,
       description: property.description.slice(0, 160),
       images: [primaryImage],
     },
@@ -130,7 +137,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
       ? images.find((i) => i.is_primary)?.storage_path || images[0].storage_path
       : null;
 
-  const whatsappMessage = `Hello POAB Global Construction, I am interested in property ${property.reference}: "${property.title}" located at ${property.location}. Please share inspection availability.`;
+  const whatsappMessage = `Hello POAB Global Construction, I am interested in property "${property.title}" located at ${property.location}. Please share inspection availability.`;
   const whatsappUrl = buildWhatsAppLink(whatsappNumber, whatsappMessage);
 
   return (
@@ -154,9 +161,6 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
             <div className="flex items-center space-x-3">
               <span className="px-2.5 py-1 bg-poab-navy-surface text-poab-gold text-xs font-semibold uppercase tracking-wider border border-poab-navy-muted">
                 {property.property_type}
-              </span>
-              <span className="font-mono text-xs text-poab-stone/80">
-                REF: {property.reference}
               </span>
             </div>
 
@@ -384,7 +388,6 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                   <PropertyEnquiryForm
                     propertyId={property.id}
                     propertyTitle={property.title}
-                    propertyRef={property.reference}
                   />
                 </div>
               )}

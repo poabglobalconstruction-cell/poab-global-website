@@ -12,9 +12,10 @@ interface PropertyCardProps {
 
 export function PropertyCard({ property }: PropertyCardProps) {
   const isSold = property.status === "Sold";
+  const allImages = property.property_images || property.images || [];
   const primaryImage =
-    property.images && property.images.length > 0
-      ? property.images.find((img) => img.is_primary)?.storage_path || property.images[0].storage_path
+    allImages.length > 0
+      ? allImages.find((img) => img.is_primary)?.storage_path || allImages[0].storage_path
       : null;
 
   return (
@@ -73,14 +74,11 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
         {/* Content */}
         <div className="p-6">
-          <div className="flex items-center justify-between text-xs text-poab-charcoal/70 mb-2">
+          <div className="flex items-center text-xs text-poab-charcoal/70 mb-2">
             <div className="flex items-center space-x-1.5 truncate">
               <MapPin className="w-3.5 h-3.5 text-poab-gold flex-shrink-0" />
               <span className="truncate">{property.location}</span>
             </div>
-            <span className="font-mono text-[10px] text-poab-charcoal/50 flex-shrink-0">
-              {property.reference}
-            </span>
           </div>
 
           <h3 className="font-heading text-lg font-bold text-poab-navy group-hover:text-poab-gold transition-colors leading-snug">

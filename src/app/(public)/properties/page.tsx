@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Building, Tag, ArrowRight } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { Property } from "@/types/database";
+import { Property, PropertyImage } from "@/types/database";
 import { PropertyCard } from "@/components/properties/PropertyCard";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getBreadcrumbSchema } from "@/lib/seo/schema";
@@ -65,7 +65,16 @@ async function getPublishedProperties(typeFilter?: string, statusFilter?: string
 
     const { data, error } = await query;
     if (error || !data) return [];
-    return data as Property[];
+    return (data as any[]).map((p) => {
+      const rawImages = (p.property_images || p.images || []) as PropertyImage[];
+      // Sort images by sort_order
+      const sortedImages = [...rawImages].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+      return {
+        ...p,
+        images: sortedImages,
+        property_images: sortedImages,
+      } as Property;
+    });
   } catch {
     return [];
   }

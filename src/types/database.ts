@@ -95,6 +95,7 @@ export interface Property {
   created_at: string;
   updated_at: string;
   images?: PropertyImage[];
+  property_images?: PropertyImage[];
 }
 
 export interface QuoteAttachment {

@@ -9,7 +9,7 @@ import { isValidPhoneNumber } from "@/lib/validation";
 interface PropertyEnquiryFormProps {
   propertyId: string;
   propertyTitle: string;
-  propertyRef: string;
+  propertyRef?: string;
 }
 
 export function PropertyEnquiryForm({
@@ -22,7 +22,7 @@ export function PropertyEnquiryForm({
     phone: "",
     email: "",
     whatsapp: "",
-    message: `Hello POAB, I would like to schedule an inspection or request further details regarding property ${propertyRef} (${propertyTitle}).`,
+    message: `Hello POAB, I would like to schedule an inspection or request further details regarding "${propertyTitle}".`,
     honeypot: "",
   });
 
@@ -98,7 +98,7 @@ export function PropertyEnquiryForm({
           Enquiry Received Successfully
         </h4>
         <p className="mt-2 text-xs text-emerald-800 leading-relaxed font-light">
-          Your enquiry regarding <strong>{propertyRef}</strong> has been received by our property team. A representative will contact you via your provided phone number or email.
+          Your enquiry regarding <strong>{propertyTitle}</strong> has been received by our property team. A representative will contact you via your provided phone number or email.
         </p>
       </div>
     );
