@@ -99,6 +99,8 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                             ? "bg-red-100 text-red-900"
                             : prop.status === "Under Offer"
                             ? "bg-amber-100 text-amber-900"
+                            : prop.status === "Withdrawn"
+                            ? "bg-slate-200 text-slate-800"
                             : "bg-emerald-100 text-emerald-900"
                         }`}
                       >

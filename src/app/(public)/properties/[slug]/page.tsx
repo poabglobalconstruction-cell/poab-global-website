@@ -124,6 +124,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
   ]);
 
   const isSold = property.status === "Sold";
+  const isWithdrawn = property.status === "Withdrawn";
   const primaryImage =
     images.length > 0
       ? images.find((i) => i.is_primary)?.storage_path || images[0].storage_path
@@ -161,7 +162,9 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
             <div>
               {isSold ? (
-                <Badge variant="sold">SOLD OUT</Badge>
+                <Badge variant="sold">SOLD</Badge>
+              ) : isWithdrawn ? (
+                <Badge variant="withdrawn">WITHDRAWN</Badge>
               ) : property.status === "Under Offer" ? (
                 <Badge variant="warning">UNDER OFFER</Badge>
               ) : (
@@ -302,14 +305,17 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
           <div className="lg:col-span-4 space-y-6">
             <div className="bg-poab-stone-light p-6 sm:p-8 border border-poab-grey-border">
               {isSold ? (
-                /* Sold State Requirement: Section 21 */
+                /* Sold State Requirement: Clear notice and disabled enquiry */
                 <div className="space-y-4 text-center">
                   <div className="p-4 bg-red-100 text-red-900 border border-red-200">
                     <span className="font-heading font-bold text-base block uppercase tracking-wider">
                       Property Sold
                     </span>
+                    <p className="mt-2 text-xs text-red-900 font-medium">
+                      This property has been sold.
+                    </p>
                     <p className="mt-1 text-xs text-red-800 font-light">
-                      This property has been acquired and closed. Normal purchase enquiries are no longer being accepted.
+                      Normal purchase enquiries are no longer being accepted for this listing.
                     </p>
                   </div>
                   <p className="text-xs text-poab-charcoal/80 font-light leading-relaxed">
@@ -320,6 +326,30 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                     className="w-full py-3 bg-poab-navy text-white text-xs uppercase tracking-wider font-semibold text-center block hover:bg-poab-navy-surface transition-colors"
                   >
                     Start Your Project
+                  </Link>
+                </div>
+              ) : isWithdrawn ? (
+                /* Withdrawn State Notice */
+                <div className="space-y-4 text-center">
+                  <div className="p-4 bg-slate-100 text-slate-800 border border-slate-300">
+                    <span className="font-heading font-bold text-base block uppercase tracking-wider">
+                      Listing Withdrawn
+                    </span>
+                    <p className="mt-2 text-xs text-slate-700 font-medium">
+                      This property listing has been withdrawn.
+                    </p>
+                    <p className="mt-1 text-xs text-slate-600 font-light">
+                      It is currently not available for purchase or inspection.
+                    </p>
+                  </div>
+                  <p className="text-xs text-poab-charcoal/80 font-light leading-relaxed">
+                    Explore our active listings or get in touch with our team for upcoming development opportunities.
+                  </p>
+                  <Link
+                    href="/properties"
+                    className="w-full py-3 bg-poab-navy text-white text-xs uppercase tracking-wider font-semibold text-center block hover:bg-poab-navy-surface transition-colors"
+                  >
+                    Browse Available Properties
                   </Link>
                 </div>
               ) : (

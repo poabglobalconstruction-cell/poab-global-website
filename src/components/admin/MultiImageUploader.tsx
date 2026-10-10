@@ -14,7 +14,7 @@ import {
   Plus,
 } from "lucide-react";
 
-export interface ProjectPhotoItem {
+export interface PhotoItem {
   id: string;
   storage_path: string;
   alt_text: string;
@@ -24,13 +24,15 @@ export interface ProjectPhotoItem {
   project_stage_id?: string | null;
 }
 
+export type ProjectPhotoItem = PhotoItem;
+
 interface MultiImageUploaderProps {
   bucket: "project-images" | "property-images";
   folder?: string;
   label?: string;
   helperText?: string;
-  photos: ProjectPhotoItem[];
-  onChange: (photos: ProjectPhotoItem[]) => void;
+  photos: PhotoItem[];
+  onChange: (photos: PhotoItem[]) => void;
   // If provided, photographs can be associated with construction stages
   availableStages?: Array<{ id: string; title: string }>;
 }

@@ -1,7 +1,7 @@
 export type ProjectType = 'Residential' | 'Commercial' | 'Renovation' | 'Site Works';
 export type ProjectStatus = 'Ongoing' | 'Completed' | 'Planning';
 export type PropertyType = 'Land' | 'Bungalow' | 'Duplex' | 'Commercial' | 'Apartment';
-export type PropertyStatus = 'Available' | 'Under Offer' | 'Sold';
+export type PropertyStatus = 'Available' | 'Under Offer' | 'Sold' | 'Withdrawn';
 export type QuoteStatus = 'New' | 'Contacted' | 'Site Assessment' | 'Quotation Sent' | 'Won' | 'Lost' | 'Closed';
 export type PropertyEnquiryStatus = 'New' | 'Contacted' | 'Scheduled Inspection' | 'Closed';
 export type SellRequestStatus = 'New' | 'Reviewing' | 'Contacted' | 'Accepted' | 'Rejected' | 'Closed';

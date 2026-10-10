@@ -58,6 +58,9 @@ async function getPublishedProperties(typeFilter?: string, statusFilter?: string
 
     if (statusFilter && statusFilter !== "All") {
       query = query.eq("status", statusFilter);
+    } else {
+      // By default, exclude withdrawn listings from public browsing
+      query = query.neq("status", "Withdrawn");
     }
 
     const { data, error } = await query;

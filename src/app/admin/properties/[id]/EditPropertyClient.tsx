@@ -3,12 +3,12 @@
 import React, { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, Archive, Trash2, CheckCircle2, AlertCircle, AlertTriangle, Images, Star } from "lucide-react";
+import { ArrowLeft, Save, Archive, Trash2, CheckCircle2, AlertCircle, AlertTriangle } from "lucide-react";
 import { Property, PropertyImage } from "@/types/database";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { DeleteConfirmationModal } from "@/components/admin/DeleteConfirmationModal";
-import { AdminImageUploader } from "@/components/admin/AdminImageUploader";
+import { MultiImageUploader, PhotoItem } from "@/components/admin/MultiImageUploader";
 
 interface EditPropertyClientProps {
   initialProperty: Property;
@@ -23,7 +23,16 @@ export function EditPropertyClient({ initialProperty, initialImages = [] }: Edit
     ...initialProperty,
     featuresText: initialProperty.features?.join("\n") || "",
   });
-  const [images, setImages] = useState<PropertyImage[]>(initialImages);
+  const [photos, setPhotos] = useState<PhotoItem[]>(
+    initialImages.map((img, idx) => ({
+      id: img.id,
+      storage_path: img.storage_path,
+      alt_text: img.alt_text || initialProperty.title,
+      caption: null,
+      sort_order: typeof img.sort_order === "number" ? img.sort_order : idx,
+      is_cover: Boolean(img.is_primary),
+    }))
+  );
 
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -53,13 +62,26 @@ export function EditPropertyClient({ initialProperty, initialImages = [] }: Edit
         ? property.featuresText.split(/[\n,]/).map((f) => f.trim()).filter(Boolean)
         : [];
 
+      // Clean payload: strip frontend-only featuresText and include normalized features & images
+      const { featuresText, ...propertyData } = property;
+
+      // Ensure at least one image is cover if images exist
+      const hasCover = photos.some((p) => p.is_cover);
+      const normalizedPhotos = photos.map((p, idx) => ({
+        id: p.id,
+        storage_path: p.storage_path,
+        alt_text: p.alt_text || property.title,
+        sort_order: p.sort_order ?? idx,
+        is_primary: hasCover ? Boolean(p.is_cover) : idx === 0,
+      }));
+
       const res = await fetch("/api/admin/properties", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...property,
+          ...propertyData,
           features: featuresArray,
-          images,
+          images: normalizedPhotos,
         }),
       });
 
@@ -148,34 +170,6 @@ export function EditPropertyClient({ initialProperty, initialImages = [] }: Edit
     } finally {
       setIsDeleting(false);
     }
-  };
-
-  const handleAddImage = (storagePath: string, publicUrl: string) => {
-    const isFirst = images.length === 0;
-    const newImg: PropertyImage = {
-      id: crypto.randomUUID(),
-      property_id: property.id,
-      storage_path: publicUrl,
-      alt_text: property.title,
-      sort_order: images.length,
-      is_primary: isFirst,
-      created_at: new Date().toISOString(),
-    };
-    setImages([...images, newImg]);
-    setStatusMessage("Photo added. Click 'Save Changes' to save your updates.");
-  };
-
-  const removeImage = (id: string) => {
-    setImages(images.filter((img) => img.id !== id));
-  };
-
-  const setPrimaryImage = (id: string) => {
-    setImages(
-      images.map((img) => ({
-        ...img,
-        is_primary: img.id === id,
-      }))
-    );
   };
 
   return (
@@ -315,6 +309,7 @@ export function EditPropertyClient({ initialProperty, initialImages = [] }: Edit
               <option value="Available">Available</option>
               <option value="Under Offer">Under Offer</option>
               <option value="Sold">Sold</option>
+              <option value="Withdrawn">Withdrawn</option>
             </select>
           </div>
         </div>
@@ -363,73 +358,15 @@ export function EditPropertyClient({ initialProperty, initialImages = [] }: Edit
           onChange={(e) => setProperty({ ...property, featuresText: e.target.value })}
         />
 
-        {/* Property Photos & Gallery Manager */}
-        <div className="p-6 bg-poab-stone-light/40 border border-poab-grey-border space-y-4">
-          <div className="flex items-center justify-between border-b border-poab-grey-border pb-3">
-            <div className="flex items-center space-x-2">
-              <Images className="w-5 h-5 text-poab-gold" />
-              <h3 className="font-heading text-xs font-bold text-poab-navy uppercase tracking-wider">
-                Property Photos
-              </h3>
-            </div>
-            <span className="text-xs font-mono text-poab-gold font-bold">
-              {images.length} Photos
-            </span>
-          </div>
-
-          {images.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {images.map((img) => (
-                <div
-                  key={img.id}
-                  className="relative group bg-white border border-poab-grey-border p-1 space-y-1 text-xs"
-                >
-                  <div className="w-full h-24 bg-poab-stone overflow-hidden relative">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={img.storage_path}
-                      alt={img.alt_text}
-                      className="w-full h-full object-cover"
-                    />
-                    {img.is_primary && (
-                      <span className="absolute top-1 left-1 px-1.5 py-0.5 bg-poab-gold text-poab-navy text-[9px] font-bold uppercase tracking-wider flex items-center space-x-0.5">
-                        <Star className="w-2.5 h-2.5 fill-poab-navy" />
-                        <span>Cover</span>
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-between pt-1">
-                    {!img.is_primary && (
-                      <button
-                        type="button"
-                        onClick={() => setPrimaryImage(img.id)}
-                        className="text-[10px] text-poab-navy hover:text-poab-gold font-semibold uppercase tracking-wider"
-                      >
-                        Set as Cover Photo
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => removeImage(img.id)}
-                      className="text-red-700 hover:text-red-900 ml-auto p-0.5"
-                      title="Remove photograph"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <AdminImageUploader
-            bucket="property-images"
-            folder={`listings/${property.reference}`}
-            label="Add Property Photo"
-            helperText="Select photos from your mobile phone or computer. The cover photo is displayed on listing cards."
-            onUploadComplete={(path, url) => handleAddImage(path, url)}
-          />
-        </div>
+        {/* Multi-Image Gallery Manager */}
+        <MultiImageUploader
+          bucket="property-images"
+          folder={`listings/${property.reference}`}
+          label="Property Photographs & Gallery"
+          helperText="Select or drag multiple property photos (JPG, PNG, WebP up to 15MB each). You can set the primary cover photo, reorder images, and add descriptions."
+          photos={photos}
+          onChange={(updated) => setPhotos(updated)}
+        />
 
         <div className="p-4 bg-poab-stone-light border border-poab-grey-border flex flex-wrap gap-8 text-xs font-semibold uppercase text-poab-navy">
           <label className="flex items-center space-x-2.5 cursor-pointer">

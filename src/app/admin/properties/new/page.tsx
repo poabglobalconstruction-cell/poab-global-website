@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, Save, AlertCircle } from "lucide-react";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { MultiImageUploader, PhotoItem } from "@/components/admin/MultiImageUploader";
 
 export default function NewPropertyPage() {
   const router = useRouter();
@@ -28,6 +29,7 @@ export default function NewPropertyPage() {
     published: false,
   });
 
+  const [photos, setPhotos] = useState<PhotoItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -82,12 +84,22 @@ export default function NewPropertyPage() {
             .filter(Boolean)
         : [];
 
+      const hasCover = photos.some((p) => p.is_cover);
+      const normalizedPhotos = photos.map((p, idx) => ({
+        id: p.id,
+        storage_path: p.storage_path,
+        alt_text: p.alt_text || formData.title,
+        sort_order: p.sort_order ?? idx,
+        is_primary: hasCover ? Boolean(p.is_cover) : idx === 0,
+      }));
+
       const res = await fetch("/api/admin/properties", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
           features: featuresArray,
+          images: normalizedPhotos,
         }),
       });
 
@@ -187,6 +199,7 @@ export default function NewPropertyPage() {
               <option value="Available">Available</option>
               <option value="Under Offer">Under Offer</option>
               <option value="Sold">Sold</option>
+              <option value="Withdrawn">Withdrawn</option>
             </select>
           </div>
         </div>
@@ -241,6 +254,16 @@ export default function NewPropertyPage() {
           onChange={(e) => setFormData({ ...formData, features: e.target.value })}
           placeholder="Registered Survey Plan&#10;Gated & Perimeter Fenced&#10;Good Motor Vehicle Access Road"
           helperText="Features will be displayed as badge pills on the listing card and details page."
+        />
+
+        {/* Multi-Image Gallery Manager */}
+        <MultiImageUploader
+          bucket="property-images"
+          folder="listings/pending"
+          label="Property Photographs & Gallery (Optional)"
+          helperText="Select or drag multiple property photos (JPG, PNG, WebP up to 15MB each). The primary photo will be used as the listing cover."
+          photos={photos}
+          onChange={(updated) => setPhotos(updated)}
         />
 
         {/* Toggles */}

@@ -47,6 +47,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
               <Badge variant="sold">SOLD</Badge>
             ) : property.status === "Under Offer" ? (
               <Badge variant="warning">UNDER OFFER</Badge>
+            ) : property.status === "Withdrawn" ? (
+              <Badge variant="withdrawn">WITHDRAWN</Badge>
             ) : (
               <Badge variant="success">AVAILABLE</Badge>
             )}
