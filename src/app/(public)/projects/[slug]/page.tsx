@@ -3,13 +3,15 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Calendar, ArrowRight, CheckCircle2, Building, ChevronRight, Layers } from "lucide-react";
+import { MapPin, Calendar, ArrowRight, CheckCircle2, Building, ChevronRight, Layers, Video as VideoIcon } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Project, ProjectStage, ProjectImage } from "@/types/database";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getBreadcrumbSchema } from "@/lib/seo/schema";
+import { ProjectVideoPlayer } from "@/components/projects/ProjectVideoPlayer";
+import { parseProjectVideos } from "@/lib/video";
 
 interface ProjectDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -115,6 +117,8 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
     notFound();
   }
 
+  const { cleanDescription, videos } = parseProjectVideos(project.description);
+
   const breadcrumbs = getBreadcrumbSchema([
     { name: "Home", path: "/" },
     { name: "Projects", path: "/projects" },
@@ -193,12 +197,12 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
             </div>
 
             {/* Full Project Description */}
-            {project.description && (
+            {cleanDescription && (
               <div className="prose max-w-none text-poab-charcoal/85 leading-relaxed text-sm sm:text-base font-light space-y-4">
                 <h2 className="font-heading text-xl sm:text-2xl font-bold text-poab-navy">
                   Project Scope &amp; Structural Overview
                 </h2>
-                <div className="whitespace-pre-line">{project.description}</div>
+                <div className="whitespace-pre-line">{cleanDescription}</div>
               </div>
             )}
 
@@ -272,6 +276,27 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                             </div>
                           </div>
                         )}
+
+                        {/* Stage Specific Construction Videos */}
+                        {videos.filter((vid) => vid.project_stage_id === stage.id).length > 0 && (
+                          <div className="mt-4 pt-3 border-t border-poab-grey-border/60">
+                            <span className="text-[10px] uppercase font-mono font-bold tracking-wider text-poab-navy/60 block mb-2 flex items-center space-x-1.5">
+                              <VideoIcon className="w-3.5 h-3.5 text-poab-gold" />
+                              <span>Stage Progress Videos:</span>
+                            </span>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {videos
+                                .filter((vid) => vid.project_stage_id === stage.id)
+                                .map((vid) => (
+                                  <ProjectVideoPlayer
+                                    key={vid.id}
+                                    video={vid}
+                                    stageName={stage.title}
+                                  />
+                                ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -284,6 +309,30 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                 </div>
               )}
             </div>
+
+            {/* Construction Videos & Progress Footage */}
+            {videos.length > 0 && (
+              <div className="pt-8 border-t border-poab-grey-border">
+                <div className="flex items-center space-x-2.5 mb-6">
+                  <VideoIcon className="w-5 h-5 text-poab-gold" />
+                  <h2 className="font-heading text-xl sm:text-2xl font-bold text-poab-navy">
+                    Construction Videos &amp; Site Progress
+                  </h2>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  {videos.map((vid) => {
+                    const matchedStage = stages.find((s) => s.id === vid.project_stage_id);
+                    return (
+                      <ProjectVideoPlayer
+                        key={vid.id}
+                        video={vid}
+                        stageName={matchedStage ? matchedStage.title : null}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Gallery Grid */}
             {images.length > 0 && (

@@ -18,6 +18,7 @@ import {
   Check,
   X,
   Camera,
+  Video as VideoIcon,
 } from "lucide-react";
 import { Project, ProjectStage, ProjectImage } from "@/types/database";
 import { Input, Textarea } from "@/components/ui/Input";
@@ -25,6 +26,12 @@ import { Button } from "@/components/ui/Button";
 import { DeleteConfirmationModal } from "@/components/admin/DeleteConfirmationModal";
 import { AdminImageUploader } from "@/components/admin/AdminImageUploader";
 import { MultiImageUploader, ProjectPhotoItem } from "@/components/admin/MultiImageUploader";
+import { ProjectVideoManager } from "@/components/admin/ProjectVideoManager";
+import {
+  ProjectVideo,
+  parseProjectVideos,
+  serializeProjectVideos,
+} from "@/lib/video";
 
 interface EditProjectClientProps {
   initialProject: Project;
@@ -42,6 +49,14 @@ export function EditProjectClient({
 
   const [project, setProject] = useState(initialProject);
   const [stages, setStages] = useState(initialStages);
+
+  // Parse project description to separate clean text from embedded video metadata
+  const parsedInitialDesc = React.useMemo(() => {
+    return parseProjectVideos(initialProject.description);
+  }, [initialProject.description]);
+
+  const [cleanDescription, setCleanDescription] = useState(parsedInitialDesc.cleanDescription);
+  const [videos, setVideos] = useState<ProjectVideo[]>(parsedInitialDesc.videos);
 
   // Initialize unified photos from initialImages, ensuring cover image is represented
   const initialUnifiedPhotos: ProjectPhotoItem[] = React.useMemo(() => {
@@ -121,9 +136,11 @@ export function EditProjectClient({
     try {
       const coverPhoto = photos.find((p) => p.is_cover) || photos[0];
       const resolvedCover = coverPhoto ? coverPhoto.storage_path : project.cover_image_path || null;
+      const finalDescription = serializeProjectVideos(cleanDescription, videos);
 
       const payload = {
         ...project,
+        description: finalDescription,
         cover_image_path: resolvedCover,
         ...(project.published ? { archived_at: null } : {}),
         stages,
@@ -141,10 +158,11 @@ export function EditProjectClient({
 
       setProject((prev) => ({
         ...prev,
+        description: finalDescription,
         cover_image_path: resolvedCover,
         ...(project.published ? { archived_at: null } : {}),
       }));
-      setStatusMessage("Project specifications, timeline stages, and gallery images saved successfully.");
+      setStatusMessage("Project specifications, timeline stages, videos, and gallery images saved successfully.");
       router.refresh();
     } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : "Error saving project");
@@ -475,8 +493,8 @@ export function EditProjectClient({
         <Textarea
           label="Detailed Description"
           rows={4}
-          value={project.description || ""}
-          onChange={(e) => setProject({ ...project, description: e.target.value })}
+          value={cleanDescription}
+          onChange={(e) => setCleanDescription(e.target.value)}
         />
 
         {/* Project Photography & Multi-Image Gallery Manager */}
@@ -489,6 +507,21 @@ export function EditProjectClient({
             photos={photos}
             onChange={setPhotos}
             availableStages={stages.map((s) => ({ id: s.id, title: s.title }))}
+          />
+        </div>
+
+        {/* Project Video Management (Method A - External Video Links) */}
+        <div className="p-4 sm:p-6 bg-poab-stone-light/40 border border-poab-grey-border space-y-4">
+          <div className="flex items-center space-x-2 border-b border-poab-grey-border pb-3">
+            <VideoIcon className="w-4 h-4 text-poab-gold" />
+            <h3 className="font-heading text-xs font-bold text-poab-navy uppercase tracking-wider">
+              Project Videos & Construction Footage
+            </h3>
+          </div>
+          <ProjectVideoManager
+            videos={videos}
+            onChange={setVideos}
+            stages={stages.map((s) => ({ id: s.id, title: s.title }))}
           />
         </div>
 

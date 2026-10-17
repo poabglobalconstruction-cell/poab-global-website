@@ -3,16 +3,19 @@
 import React, { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, AlertCircle, Layers } from "lucide-react";
+import { ArrowLeft, Save, AlertCircle, Layers, Video as VideoIcon } from "lucide-react";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { MultiImageUploader, ProjectPhotoItem } from "@/components/admin/MultiImageUploader";
+import { ProjectVideoManager } from "@/components/admin/ProjectVideoManager";
+import { ProjectVideo, serializeProjectVideos } from "@/lib/video";
 
 export default function NewProjectPage() {
   const router = useRouter();
   const errorRef = useRef<HTMLDivElement>(null);
 
   const [photos, setPhotos] = useState<ProjectPhotoItem[]>([]);
+  const [videos, setVideos] = useState<ProjectVideo[]>([]);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -87,9 +90,11 @@ export default function NewProjectPage() {
       // Find the chosen cover photo, or the first photo, if any were uploaded
       const coverPhoto = photos.find((p) => p.is_cover) || photos[0];
       const resolvedCoverPath = coverPhoto ? coverPhoto.storage_path : formData.cover_image_path || null;
+      const finalDescription = serializeProjectVideos(formData.description, videos);
 
       const payload = {
         ...formData,
+        description: finalDescription,
         cover_image_path: resolvedCoverPath,
         images: photos,
       };
@@ -246,6 +251,25 @@ export default function NewProjectPage() {
             helperText="Upload multiple photographs from your device together. Set any photo as the project's primary cover using 'Set as Cover'."
             photos={photos}
             onChange={setPhotos}
+          />
+        </div>
+
+        {/* Project Video Management (Method A - External Video Links) */}
+        <div className="p-4 sm:p-6 bg-poab-stone-light/40 border border-poab-grey-border space-y-4">
+          <div className="flex items-center space-x-2 border-b border-poab-grey-border pb-3">
+            <VideoIcon className="w-4 h-4 text-poab-gold" />
+            <h3 className="font-heading text-xs font-bold text-poab-navy uppercase tracking-wider">
+              Project Videos & Construction Footage
+            </h3>
+          </div>
+          <ProjectVideoManager
+            videos={videos}
+            onChange={setVideos}
+            stages={
+              formData.initial_stage_title.trim()
+                ? [{ id: "temp-initial-stage", title: formData.initial_stage_title.trim() }]
+                : []
+            }
           />
         </div>
 
