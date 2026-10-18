@@ -1,0 +1,110 @@
+-- ==============================================================================
+-- POAB GLOBAL CONSTRUCTION COMPANY LTD
+-- Migration: 20261018000001_direct_video_upload.sql
+-- Purpose: Implement direct video upload tables, indexes, RLS, and private storage buckets
+-- Non-destructive: Preserves all existing projects, properties, photographs, and YouTube links
+-- ==============================================================================
+
+-- 1. PROJECT VIDEOS TABLE
+CREATE TABLE IF NOT EXISTS project_videos (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    project_stage_id UUID REFERENCES project_stages(id) ON DELETE SET NULL,
+    storage_path TEXT NOT NULL,
+    thumbnail_path TEXT,
+    title TEXT NOT NULL,
+    caption TEXT,
+    duration_seconds INT,
+    file_size_bytes BIGINT NOT NULL DEFAULT 0,
+    mime_type TEXT NOT NULL DEFAULT 'video/mp4',
+    sort_order INT NOT NULL DEFAULT 0,
+    is_published BOOLEAN NOT NULL DEFAULT true,
+    purge_failed BOOLEAN NOT NULL DEFAULT false,
+    purge_error TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Indexes for fast ordering and published filtering
+CREATE INDEX IF NOT EXISTS idx_project_videos_project ON project_videos(project_id, sort_order);
+CREATE INDEX IF NOT EXISTS idx_project_videos_published ON project_videos(project_id, is_published);
+
+-- 2. PROPERTY VIDEOS TABLE
+CREATE TABLE IF NOT EXISTS property_videos (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
+    storage_path TEXT NOT NULL,
+    thumbnail_path TEXT,
+    title TEXT NOT NULL,
+    caption TEXT,
+    duration_seconds INT,
+    file_size_bytes BIGINT NOT NULL DEFAULT 0,
+    mime_type TEXT NOT NULL DEFAULT 'video/mp4',
+    sort_order INT NOT NULL DEFAULT 0,
+    is_published BOOLEAN NOT NULL DEFAULT true,
+    purge_failed BOOLEAN NOT NULL DEFAULT false,
+    purge_error TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Indexes for fast ordering and published filtering
+CREATE INDEX IF NOT EXISTS idx_property_videos_property ON property_videos(property_id, sort_order);
+CREATE INDEX IF NOT EXISTS idx_property_videos_published ON property_videos(property_id, is_published);
+
+-- 3. ROW-LEVEL SECURITY (RLS) POLICIES
+ALTER TABLE project_videos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE property_videos ENABLE ROW LEVEL SECURITY;
+
+-- Project Videos Public Policy: Only view published videos of published, non-archived projects
+DROP POLICY IF EXISTS "Public can view published videos of published projects" ON project_videos;
+CREATE POLICY "Public can view published videos of published projects" 
+    ON project_videos FOR SELECT 
+    USING (
+        is_published = true AND
+        EXISTS (
+            SELECT 1 FROM projects 
+            WHERE projects.id = project_videos.project_id 
+              AND projects.published = true 
+              AND projects.archived_at IS NULL
+        )
+    );
+
+-- Project Videos Admin Policy: Active admins have full CRUD access
+DROP POLICY IF EXISTS "Admins have full access to project videos" ON project_videos;
+CREATE POLICY "Admins have full access to project videos" 
+    ON project_videos FOR ALL 
+    USING (is_active_admin()) 
+    WITH CHECK (is_active_admin());
+
+-- Property Videos Public Policy: Only view published videos of published, non-archived properties
+DROP POLICY IF EXISTS "Public can view published videos of published properties" ON property_videos;
+CREATE POLICY "Public can view published videos of published properties" 
+    ON property_videos FOR SELECT 
+    USING (
+        is_published = true AND
+        EXISTS (
+            SELECT 1 FROM properties 
+            WHERE properties.id = property_videos.property_id 
+              AND properties.published = true 
+              AND properties.archived_at IS NULL
+        )
+    );
+
+-- Property Videos Admin Policy: Active admins have full CRUD access
+DROP POLICY IF EXISTS "Admins have full access to property videos" ON property_videos;
+CREATE POLICY "Admins have full access to property videos" 
+    ON property_videos FOR ALL 
+    USING (is_active_admin()) 
+    WITH CHECK (is_active_admin());
+
+-- 4. PRIVATE STORAGE BUCKETS SETUP
+-- Both buckets are private (public = false) with a 50MB file size limit
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types) 
+VALUES 
+    ('project-videos', 'project-videos', false, 52428800, ARRAY['video/mp4', 'video/quicktime', 'video/webm', 'image/jpeg', 'image/png']),
+    ('property-videos', 'property-videos', false, 52428800, ARRAY['video/mp4', 'video/quicktime', 'video/webm', 'image/jpeg', 'image/png'])
+ON CONFLICT (id) DO UPDATE SET 
+    public = EXCLUDED.public,
+    file_size_limit = EXCLUDED.file_size_limit,
+    allowed_mime_types = EXCLUDED.allowed_mime_types;

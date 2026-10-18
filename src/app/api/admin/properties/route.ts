@@ -299,6 +299,28 @@ export async function DELETE(req: NextRequest) {
       }
     }
 
+    // 4b. Identify and purge private property videos and posters
+    try {
+      const { data: videoRows } = await client
+        .from("property_videos")
+        .select("storage_path, thumbnail_path")
+        .eq("property_id", id);
+
+      if (videoRows && videoRows.length > 0) {
+        const videoFilesToPurge: string[] = [];
+        videoRows.forEach((v) => {
+          if (v.storage_path) videoFilesToPurge.push(v.storage_path);
+          if (v.thumbnail_path) videoFilesToPurge.push(v.thumbnail_path);
+        });
+
+        if (videoFilesToPurge.length > 0) {
+          await client.storage.from("property-videos").remove(videoFilesToPurge);
+        }
+      }
+    } catch (vidCatch) {
+      console.warn("Storage video deletion warning for property:", vidCatch);
+    }
+
     // 5. Permanently delete property record from database
     const { error: deleteErr } = await client
       .from("properties")

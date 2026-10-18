@@ -3,15 +3,17 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Bed, Bath, Maximize2, ShieldCheck, ChevronRight, MessageCircle } from "lucide-react";
+import { MapPin, Bed, Bath, Maximize2, ShieldCheck, ChevronRight, MessageCircle, Video as VideoIcon } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { Property, PropertyImage } from "@/types/database";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { Property, PropertyImage, PropertyVideo } from "@/types/database";
 import { Badge } from "@/components/ui/Badge";
 import { formatPrice, buildWhatsAppLink } from "@/lib/utils";
 import { PropertyEnquiryForm } from "@/components/properties/PropertyEnquiryForm";
 import { getPublicContactSettings } from "@/lib/contact-settings";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getBreadcrumbSchema } from "@/lib/seo/schema";
+import { DirectVideoPlayer } from "@/components/media/DirectVideoPlayer";
 
 interface PropertyDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -22,11 +24,12 @@ export const revalidate = 60;
 async function getPropertyBySlug(slug: string): Promise<{
   property: Property | null;
   images: PropertyImage[];
+  videos: PropertyVideo[];
   whatsappNumber: string | null;
 }> {
   try {
     const supabase = await createServerSupabaseClient();
-    if (!supabase) return { property: null, images: [], whatsappNumber: null };
+    if (!supabase) return { property: null, images: [], videos: [], whatsappNumber: null };
 
     const { data: propData, error: propError } = await supabase
       .from("properties")
@@ -37,7 +40,7 @@ async function getPropertyBySlug(slug: string): Promise<{
       .single();
 
     if (propError || !propData) {
-      return { property: null, images: [], whatsappNumber: null };
+      return { property: null, images: [], videos: [], whatsappNumber: null };
     }
 
     const property = propData as Property;
@@ -56,6 +59,47 @@ async function getPropertyBySlug(slug: string): Promise<{
       return (a.sort_order ?? 0) - (b.sort_order ?? 0);
     });
 
+    // Fetch direct uploaded property videos (walkthroughs / tours)
+    let videos: PropertyVideo[] = [];
+    try {
+      const { data: videosData } = await supabase
+        .from("property_videos")
+        .select("*")
+        .eq("property_id", property.id)
+        .eq("is_published", true)
+        .order("sort_order", { ascending: true });
+
+      if (videosData && videosData.length > 0) {
+        const adminSupabase = createAdminSupabaseClient();
+        videos = await Promise.all(
+          videosData.map(async (v) => {
+            let signedUrl: string | null = null;
+            let posterUrl: string | null = null;
+            if (adminSupabase) {
+              const { data: signData } = await adminSupabase.storage
+                .from("property-videos")
+                .createSignedUrl(v.storage_path, 3600);
+              signedUrl = signData?.signedUrl || null;
+
+              if (v.thumbnail_path) {
+                const { data: thumbSign } = await adminSupabase.storage
+                  .from("property-videos")
+                  .createSignedUrl(v.thumbnail_path, 3600);
+                posterUrl = thumbSign?.signedUrl || null;
+              }
+            }
+            return {
+              ...v,
+              signed_playback_url: signedUrl,
+              signed_thumbnail_url: posterUrl,
+            };
+          })
+        );
+      }
+    } catch {
+      videos = [];
+    }
+
     // Fetch whatsapp from shared contact settings
     const contact = await getPublicContactSettings();
     const whatsappNumber = contact.whatsapp_number || null;
@@ -63,10 +107,11 @@ async function getPropertyBySlug(slug: string): Promise<{
     return {
       property,
       images: sortedImages,
+      videos,
       whatsappNumber,
     };
   } catch {
-    return { property: null, images: [], whatsappNumber: null };
+    return { property: null, images: [], videos: [], whatsappNumber: null };
   }
 }
 
@@ -118,7 +163,7 @@ export async function generateMetadata({ params }: PropertyDetailPageProps): Pro
 
 export default async function PropertyDetailPage({ params }: PropertyDetailPageProps) {
   const resolvedParams = await params;
-  const { property, images, whatsappNumber } = await getPropertyBySlug(resolvedParams.slug);
+  const { property, images, videos, whatsappNumber } = await getPropertyBySlug(resolvedParams.slug);
 
   if (!property) {
     notFound();
@@ -299,6 +344,27 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                       <ShieldCheck className="w-4 h-4 text-poab-gold flex-shrink-0" />
                       <span>{feat}</span>
                     </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Property Video Tours & Virtual Walkthroughs */}
+            {videos.length > 0 && (
+              <div className="pt-8 border-t border-poab-grey-border">
+                <div className="flex items-center space-x-2.5 mb-6">
+                  <VideoIcon className="w-5 h-5 text-poab-gold" />
+                  <h2 className="font-heading text-xl sm:text-2xl font-bold text-poab-navy">
+                    Property Video Tour &amp; Walkthrough
+                  </h2>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  {videos.map((vid) => (
+                    <DirectVideoPlayer
+                      key={vid.id}
+                      video={vid}
+                      entityType="property"
+                    />
                   ))}
                 </div>
               </div>

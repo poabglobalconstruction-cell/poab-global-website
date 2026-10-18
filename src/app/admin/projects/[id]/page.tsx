@@ -2,7 +2,7 @@ import React from "react";
 import { notFound } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { Project, ProjectStage, ProjectImage } from "@/types/database";
+import { Project, ProjectStage, ProjectImage, ProjectVideo } from "@/types/database";
 import { EditProjectClient } from "./EditProjectClient";
 
 interface EditProjectPageProps {
@@ -15,12 +15,13 @@ async function getProjectWithStages(id: string): Promise<{
   project: Project | null;
   stages: ProjectStage[];
   images: ProjectImage[];
+  videos: ProjectVideo[];
 }> {
   try {
     const supabase = await createServerSupabaseClient();
     const admin = createAdminSupabaseClient();
     const client = admin || supabase;
-    if (!client) return { project: null, stages: [], images: [] };
+    if (!client) return { project: null, stages: [], images: [], videos: [] };
 
     const { data: project, error: pError } = await client
       .from("projects")
@@ -28,9 +29,9 @@ async function getProjectWithStages(id: string): Promise<{
       .eq("id", id)
       .single();
 
-    if (pError || !project) return { project: null, stages: [], images: [] };
+    if (pError || !project) return { project: null, stages: [], images: [], videos: [] };
 
-    const [{ data: stages }, { data: images }] = await Promise.all([
+    const [{ data: stages }, { data: images }, { data: videos }] = await Promise.all([
       client
         .from("project_stages")
         .select("*")
@@ -41,21 +42,27 @@ async function getProjectWithStages(id: string): Promise<{
         .select("*")
         .eq("project_id", id)
         .order("sort_order", { ascending: true }),
+      client
+        .from("project_videos")
+        .select("*")
+        .eq("project_id", id)
+        .order("sort_order", { ascending: true }),
     ]);
 
     return {
       project: project as Project,
       stages: (stages as ProjectStage[]) || [],
       images: (images as ProjectImage[]) || [],
+      videos: videos || [],
     };
   } catch {
-    return { project: null, stages: [], images: [] };
+    return { project: null, stages: [], images: [], videos: [] };
   }
 }
 
 export default async function EditProjectPage({ params }: EditProjectPageProps) {
   const resolvedParams = await params;
-  const { project, stages, images } = await getProjectWithStages(resolvedParams.id);
+  const { project, stages, images, videos } = await getProjectWithStages(resolvedParams.id);
 
   if (!project) {
     notFound();
@@ -66,6 +73,7 @@ export default async function EditProjectPage({ params }: EditProjectPageProps) 
       initialProject={project}
       initialStages={stages}
       initialImages={images}
+      initialDirectVideos={videos}
     />
   );
 }

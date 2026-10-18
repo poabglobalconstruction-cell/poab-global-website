@@ -62,6 +62,28 @@ export interface Project {
   updated_at: string;
   stages?: ProjectStage[];
   images?: ProjectImage[];
+  videos?: ProjectVideo[];
+}
+
+export interface ProjectVideo {
+  id: string;
+  project_id: string;
+  project_stage_id: string | null;
+  storage_path: string;
+  thumbnail_path: string | null;
+  title: string;
+  caption: string | null;
+  duration_seconds: number | null;
+  file_size_bytes: number;
+  mime_type: string;
+  sort_order: number;
+  is_published: boolean;
+  purge_failed?: boolean;
+  purge_error?: string | null;
+  created_at: string;
+  updated_at?: string;
+  signed_playback_url?: string | null;
+  signed_thumbnail_url?: string | null;
 }
 
 export interface PropertyImage {
@@ -72,6 +94,26 @@ export interface PropertyImage {
   sort_order: number;
   is_primary: boolean;
   created_at: string;
+}
+
+export interface PropertyVideo {
+  id: string;
+  property_id: string;
+  storage_path: string;
+  thumbnail_path: string | null;
+  title: string;
+  caption: string | null;
+  duration_seconds: number | null;
+  file_size_bytes: number;
+  mime_type: string;
+  sort_order: number;
+  is_published: boolean;
+  purge_failed?: boolean;
+  purge_error?: string | null;
+  created_at: string;
+  updated_at?: string;
+  signed_playback_url?: string | null;
+  signed_thumbnail_url?: string | null;
 }
 
 export interface Property {
@@ -96,6 +138,7 @@ export interface Property {
   updated_at: string;
   images?: PropertyImage[];
   property_images?: PropertyImage[];
+  videos?: PropertyVideo[];
 }
 
 export interface QuoteAttachment {

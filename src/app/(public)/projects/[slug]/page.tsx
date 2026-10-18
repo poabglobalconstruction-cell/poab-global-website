@@ -5,12 +5,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Calendar, ArrowRight, CheckCircle2, Building, ChevronRight, Layers, Video as VideoIcon } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { Project, ProjectStage, ProjectImage } from "@/types/database";
+import { Project, ProjectStage, ProjectImage, ProjectVideo } from "@/types/database";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getBreadcrumbSchema } from "@/lib/seo/schema";
 import { ProjectVideoPlayer } from "@/components/projects/ProjectVideoPlayer";
+import { DirectVideoPlayer } from "@/components/media/DirectVideoPlayer";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { parseProjectVideos } from "@/lib/video";
 
 interface ProjectDetailPageProps {
@@ -23,10 +25,11 @@ async function getProjectBySlug(slug: string): Promise<{
   project: Project | null;
   stages: ProjectStage[];
   images: ProjectImage[];
+  directVideos: ProjectVideo[];
 }> {
   try {
     const supabase = await createServerSupabaseClient();
-    if (!supabase) return { project: null, stages: [], images: [] };
+    if (!supabase) return { project: null, stages: [], images: [], directVideos: [] };
 
     const { data: projectData, error: projectError } = await supabase
       .from("projects")
@@ -37,7 +40,7 @@ async function getProjectBySlug(slug: string): Promise<{
       .single();
 
     if (projectError || !projectData) {
-      return { project: null, stages: [], images: [] };
+      return { project: null, stages: [], images: [], directVideos: [] };
     }
 
     const project = projectData as Project;
@@ -56,13 +59,55 @@ async function getProjectBySlug(slug: string): Promise<{
       .eq("project_id", project.id)
       .order("sort_order", { ascending: true });
 
+    // Fetch direct uploaded videos
+    let directVideos: ProjectVideo[] = [];
+    try {
+      const { data: videosData } = await supabase
+        .from("project_videos")
+        .select("*")
+        .eq("project_id", project.id)
+        .eq("is_published", true)
+        .order("sort_order", { ascending: true });
+
+      if (videosData && videosData.length > 0) {
+        const adminSupabase = createAdminSupabaseClient();
+        directVideos = await Promise.all(
+          videosData.map(async (v) => {
+            let signedUrl: string | null = null;
+            let posterUrl: string | null = null;
+            if (adminSupabase) {
+              const { data: signData } = await adminSupabase.storage
+                .from("project-videos")
+                .createSignedUrl(v.storage_path, 3600);
+              signedUrl = signData?.signedUrl || null;
+
+              if (v.thumbnail_path) {
+                const { data: thumbSign } = await adminSupabase.storage
+                  .from("project-videos")
+                  .createSignedUrl(v.thumbnail_path, 3600);
+                posterUrl = thumbSign?.signedUrl || null;
+              }
+            }
+            return {
+              ...v,
+              signed_playback_url: signedUrl,
+              signed_thumbnail_url: posterUrl,
+            };
+          })
+        );
+      }
+    } catch {
+      directVideos = [];
+    }
+
     return {
       project,
       stages: (stagesData as ProjectStage[]) || [],
       images: (imagesData as ProjectImage[]) || [],
+      directVideos,
     };
   } catch {
-    return { project: null, stages: [], images: [] };
+    return { project: null, stages: [], images: [], directVideos: [] };
   }
 }
 
@@ -111,7 +156,7 @@ export async function generateMetadata({ params }: ProjectDetailPageProps): Prom
 
 export default async function ProjectDetailPage({ params }: ProjectDetailPageProps) {
   const resolvedParams = await params;
-  const { project, stages, images } = await getProjectBySlug(resolvedParams.slug);
+  const { project, stages, images, directVideos } = await getProjectBySlug(resolvedParams.slug);
 
   if (!project) {
     notFound();
@@ -277,14 +322,25 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                           </div>
                         )}
 
-                        {/* Stage Specific Construction Videos */}
-                        {videos.filter((vid) => vid.project_stage_id === stage.id).length > 0 && (
+                        {/* Stage Specific Construction Videos (Direct + Embedded) */}
+                        {(directVideos.filter((vid) => vid.project_stage_id === stage.id).length > 0 ||
+                          videos.filter((vid) => vid.project_stage_id === stage.id).length > 0) && (
                           <div className="mt-4 pt-3 border-t border-poab-grey-border/60">
                             <span className="text-[10px] uppercase font-mono font-bold tracking-wider text-poab-navy/60 block mb-2 flex items-center space-x-1.5">
                               <VideoIcon className="w-3.5 h-3.5 text-poab-gold" />
                               <span>Stage Progress Videos:</span>
                             </span>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {directVideos
+                                .filter((vid) => vid.project_stage_id === stage.id)
+                                .map((vid) => (
+                                  <DirectVideoPlayer
+                                    key={vid.id}
+                                    video={vid}
+                                    entityType="project"
+                                    stageName={stage.title}
+                                  />
+                                ))}
                               {videos
                                 .filter((vid) => vid.project_stage_id === stage.id)
                                 .map((vid) => (
@@ -310,8 +366,8 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
               )}
             </div>
 
-            {/* Construction Videos & Progress Footage */}
-            {videos.length > 0 && (
+            {/* Construction Videos & Progress Footage (Direct + Embedded) */}
+            {(directVideos.length > 0 || videos.length > 0) && (
               <div className="pt-8 border-t border-poab-grey-border">
                 <div className="flex items-center space-x-2.5 mb-6">
                   <VideoIcon className="w-5 h-5 text-poab-gold" />
@@ -320,6 +376,17 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                   </h2>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  {directVideos.map((vid) => {
+                    const matchedStage = stages.find((s) => s.id === vid.project_stage_id);
+                    return (
+                      <DirectVideoPlayer
+                        key={vid.id}
+                        video={vid}
+                        entityType="project"
+                        stageName={matchedStage ? matchedStage.title : null}
+                      />
+                    );
+                  })}
                   {videos.map((vid) => {
                     const matchedStage = stages.find((s) => s.id === vid.project_stage_id);
                     return (

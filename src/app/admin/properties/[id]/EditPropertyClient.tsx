@@ -3,19 +3,26 @@
 import React, { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, Archive, Trash2, CheckCircle2, AlertCircle, AlertTriangle } from "lucide-react";
-import { Property, PropertyImage } from "@/types/database";
+import { ArrowLeft, Save, Archive, Trash2, CheckCircle2, AlertCircle, AlertTriangle, Sparkles, ArrowRight } from "lucide-react";
+import { Property, PropertyImage, PropertyVideo } from "@/types/database";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { DeleteConfirmationModal } from "@/components/admin/DeleteConfirmationModal";
 import { MultiImageUploader, PhotoItem } from "@/components/admin/MultiImageUploader";
+import { DirectVideoManager } from "@/components/admin/DirectVideoManager";
+import { DeleteConfirmationModal } from "@/components/admin/DeleteConfirmationModal";
+import { DirectVideoItem } from "@/lib/video-upload";
 
 interface EditPropertyClientProps {
   initialProperty: Property;
   initialImages?: PropertyImage[];
+  initialDirectVideos?: PropertyVideo[];
 }
 
-export function EditPropertyClient({ initialProperty, initialImages = [] }: EditPropertyClientProps) {
+export function EditPropertyClient({
+  initialProperty,
+  initialImages = [],
+  initialDirectVideos = [],
+}: EditPropertyClientProps) {
   const router = useRouter();
   const errorRef = useRef<HTMLDivElement>(null);
 
@@ -23,6 +30,25 @@ export function EditPropertyClient({ initialProperty, initialImages = [] }: Edit
     ...initialProperty,
     featuresText: initialProperty.features?.join("\n") || "",
   });
+  const [directVideos, setDirectVideos] = useState<DirectVideoItem[]>(initialDirectVideos);
+
+  // Fetch updated signed playback URLs for property videos on mount
+  React.useEffect(() => {
+    async function loadVideos() {
+      try {
+        const res = await fetch(`/api/admin/properties/videos?propertyId=${initialProperty.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.videos) && data.videos.length > 0) {
+            setDirectVideos(data.videos);
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to load property direct videos:", err);
+      }
+    }
+    loadVideos();
+  }, [initialProperty.id]);
   const [photos, setPhotos] = useState<PhotoItem[]>(
     initialImages.map((img, idx) => ({
       id: img.id,
@@ -367,6 +393,17 @@ export function EditPropertyClient({ initialProperty, initialImages = [] }: Edit
           photos={photos}
           onChange={(updated) => setPhotos(updated)}
         />
+
+        {/* Direct Property Video Walkthrough Manager (Private Supabase Storage + Client-Side Compression) */}
+        <div className="p-4 sm:p-6 bg-poab-stone-light/40 border border-poab-grey-border space-y-4">
+          <DirectVideoManager
+            entityType="property"
+            entityId={property.id}
+            videos={directVideos}
+            onChange={setDirectVideos}
+            isSold={property.status === "Sold"}
+          />
+        </div>
 
         <div className="p-4 bg-poab-stone-light border border-poab-grey-border flex flex-wrap gap-8 text-xs font-semibold uppercase text-poab-navy">
           <label className="flex items-center space-x-2.5 cursor-pointer">

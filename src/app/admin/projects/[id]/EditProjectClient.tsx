@@ -19,6 +19,8 @@ import {
   X,
   Camera,
   Video as VideoIcon,
+  Sparkles,
+  ArrowRight,
 } from "lucide-react";
 import { Project, ProjectStage, ProjectImage } from "@/types/database";
 import { Input, Textarea } from "@/components/ui/Input";
@@ -27,6 +29,8 @@ import { DeleteConfirmationModal } from "@/components/admin/DeleteConfirmationMo
 import { AdminImageUploader } from "@/components/admin/AdminImageUploader";
 import { MultiImageUploader, ProjectPhotoItem } from "@/components/admin/MultiImageUploader";
 import { ProjectVideoManager } from "@/components/admin/ProjectVideoManager";
+import { DirectVideoManager } from "@/components/admin/DirectVideoManager";
+import { DirectVideoItem } from "@/lib/video-upload";
 import {
   ProjectVideo,
   parseProjectVideos,
@@ -37,18 +41,39 @@ interface EditProjectClientProps {
   initialProject: Project;
   initialStages: ProjectStage[];
   initialImages?: ProjectImage[];
+  initialDirectVideos?: any[];
 }
 
 export function EditProjectClient({
   initialProject,
   initialStages,
   initialImages = [],
+  initialDirectVideos = [],
 }: EditProjectClientProps) {
   const router = useRouter();
   const errorRef = useRef<HTMLDivElement>(null);
 
   const [project, setProject] = useState(initialProject);
   const [stages, setStages] = useState(initialStages);
+  const [directVideos, setDirectVideos] = useState<DirectVideoItem[]>(initialDirectVideos);
+
+  // Fetch updated signed playback URLs for project videos on mount
+  React.useEffect(() => {
+    async function loadVideos() {
+      try {
+        const res = await fetch(`/api/admin/projects/videos?projectId=${initialProject.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.videos) && data.videos.length > 0) {
+            setDirectVideos(data.videos);
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to load project direct videos:", err);
+      }
+    }
+    loadVideos();
+  }, [initialProject.id]);
 
   // Parse project description to separate clean text from embedded video metadata
   const parsedInitialDesc = React.useMemo(() => {
@@ -521,6 +546,23 @@ export function EditProjectClient({
           <ProjectVideoManager
             videos={videos}
             onChange={setVideos}
+            stages={stages.map((s) => ({ id: s.id, title: s.title }))}
+          />
+        </div>
+
+        {/* Direct Construction Video Manager (Private Supabase Storage + Client-Side Compression) */}
+        <div className="p-4 sm:p-6 bg-poab-stone-light/40 border border-poab-grey-border space-y-4">
+          <div className="flex items-center space-x-2 border-b border-poab-grey-border pb-3">
+            <VideoIcon className="w-4 h-4 text-poab-gold" />
+            <h3 className="font-heading text-xs font-bold text-poab-navy uppercase tracking-wider">
+              Direct Construction Progress Videos
+            </h3>
+          </div>
+          <DirectVideoManager
+            entityType="project"
+            entityId={project.id}
+            videos={directVideos}
+            onChange={setDirectVideos}
             stages={stages.map((s) => ({ id: s.id, title: s.title }))}
           />
         </div>

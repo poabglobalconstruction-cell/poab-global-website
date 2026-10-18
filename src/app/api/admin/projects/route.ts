@@ -282,7 +282,29 @@ export async function DELETE(req: NextRequest) {
       }
     }
 
-    // 4. Permanently delete project record (cascades to project_stages and project_images)
+    // 3b. Identify and purge private project videos and posters
+    try {
+      const { data: videoRows } = await client
+        .from("project_videos")
+        .select("storage_path, thumbnail_path")
+        .eq("project_id", id);
+
+      if (videoRows && videoRows.length > 0) {
+        const videoFilesToPurge: string[] = [];
+        videoRows.forEach((v) => {
+          if (v.storage_path) videoFilesToPurge.push(v.storage_path);
+          if (v.thumbnail_path) videoFilesToPurge.push(v.thumbnail_path);
+        });
+
+        if (videoFilesToPurge.length > 0) {
+          await client.storage.from("project-videos").remove(videoFilesToPurge);
+        }
+      }
+    } catch (vidCatch) {
+      console.warn("Storage video deletion warning for project:", vidCatch);
+    }
+
+    // 4. Permanently delete project record (cascades to project_stages, project_images, and project_videos)
     const { error: deleteErr } = await client
       .from("projects")
       .delete()
