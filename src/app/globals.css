@@ -3,6 +3,8 @@
 @tailwind utilities;
 
 :root {
+  --font-inter: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-cinzel: "Cinzel", Georgia, serif;
   --foreground-rgb: 32, 37, 42;
   --background-start-rgb: 243, 240, 233;
   --background-end-rgb: 255, 255, 255;

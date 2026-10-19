@@ -12,6 +12,39 @@ import { ProjectCtaSection } from "@/components/home/ProjectCtaSection";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Project } from "@/types/database";
 
+import type { Metadata } from "next";
+import { COMPANY_INFO } from "@/lib/constants";
+
+export const metadata: Metadata = {
+  title: {
+    absolute: `Building Construction Company in Ibadan | ${COMPANY_INFO.shortName}`,
+  },
+  description: `${COMPANY_INFO.name} (RC ${COMPANY_INFO.cacNumber}) delivers residential and commercial building construction from foundation to finish across Ibadan, Lagos, and Nigeria.`,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: `Building Construction Company in Ibadan | ${COMPANY_INFO.shortName}`,
+    description: `${COMPANY_INFO.name} (RC ${COMPANY_INFO.cacNumber}) delivers residential and commercial building construction from foundation to finish across Ibadan, Lagos, and Nigeria.`,
+    url: "/",
+    type: "website",
+    images: [
+      {
+        url: "/images/illustrative/lagos-building-construction.jpg",
+        width: 1200,
+        height: 630,
+        alt: `${COMPANY_INFO.name} Building Construction`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Building Construction Company in Ibadan | ${COMPANY_INFO.shortName}`,
+    description: `${COMPANY_INFO.name} (RC ${COMPANY_INFO.cacNumber}) delivers residential and commercial building construction from foundation to finish across Ibadan, Lagos, and Nigeria.`,
+    images: ["/images/illustrative/lagos-building-construction.jpg"],
+  },
+};
+
 export const revalidate = 60; // Revalidate every minute
 
 async function getFeaturedProjects(): Promise<Project[]> {

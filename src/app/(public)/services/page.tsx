@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowRight, Home, Building2, Hammer, Shield, CheckCircle, Mail } from "lucide-react";
 import { COMPANY_INFO, DEPARTMENT_EMAILS } from "@/lib/constants";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getBreadcrumbSchema } from "@/lib/seo/schema";
+import { getBreadcrumbSchema, getServicesCatalogSchema } from "@/lib/seo/schema";
 
 export const metadata: Metadata = {
   title: {
@@ -149,9 +149,12 @@ export default function ServicesPage() {
     },
   ];
 
+  const servicesSchema = getServicesCatalogSchema();
+
   return (
     <div className="bg-white">
       <JsonLd data={breadcrumbs} />
+      <JsonLd data={servicesSchema} />
       {/* Header with Atmospheric Construction Backdrop */}
       <section className="relative bg-poab-navy text-white py-16 sm:py-24 border-b border-poab-navy-surface overflow-hidden">
         {/* Subtle Background Pattern */}

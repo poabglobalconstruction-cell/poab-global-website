@@ -78,6 +78,8 @@ export function DirectVideoPlayer({
             controls
             playsInline
             preload="metadata"
+            aria-label={video.title}
+            title={video.title}
             onError={handleVideoError}
             className="w-full h-full object-contain"
           >
@@ -92,6 +94,7 @@ export function DirectVideoPlayer({
                 <button
                   type="button"
                   onClick={fetchFreshUrl}
+                  aria-label={`Retry loading video: ${video.title}`}
                   className="px-3 py-1.5 bg-poab-gold text-poab-navy text-xs font-mono font-bold uppercase tracking-wider hover:bg-white transition-colors cursor-pointer"
                 >
                   Retry Loading
@@ -102,6 +105,7 @@ export function DirectVideoPlayer({
                 type="button"
                 onClick={fetchFreshUrl}
                 disabled={isLoadingUrl}
+                aria-label={`Play video: ${video.title}`}
                 className="group flex flex-col items-center space-y-2 cursor-pointer"
               >
                 <div className="w-12 h-12 rounded-full bg-poab-gold/90 text-poab-navy flex items-center justify-center group-hover:scale-105 group-hover:bg-white transition-all shadow-md">

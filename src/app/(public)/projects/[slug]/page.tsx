@@ -9,7 +9,7 @@ import { Project, ProjectStage, ProjectImage, ProjectVideo } from "@/types/datab
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getBreadcrumbSchema } from "@/lib/seo/schema";
+import { getBreadcrumbSchema, getProjectSchema } from "@/lib/seo/schema";
 import { ProjectVideoPlayer } from "@/components/projects/ProjectVideoPlayer";
 import { DirectVideoPlayer } from "@/components/media/DirectVideoPlayer";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
@@ -170,6 +170,8 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
     { name: project.title, path: `/projects/${project.slug}` },
   ]);
 
+  const projectSchema = getProjectSchema(project, images, directVideos);
+
   const statusVariant =
     project.status === "Completed"
       ? "success"
@@ -180,6 +182,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
   return (
     <div className="bg-white min-h-screen">
       <JsonLd data={breadcrumbs} />
+      <JsonLd data={projectSchema} />
       {/* Breadcrumb Bar */}
       <div className="bg-poab-stone-light border-b border-poab-grey-border py-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-xs text-poab-charcoal/70 flex items-center space-x-2">

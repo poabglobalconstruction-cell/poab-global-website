@@ -1,8 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { getOrganizationSchema, getWebsiteSchema, getBreadcrumbSchema } from "@/lib/seo/schema";
+import {
+  getOrganizationSchema,
+  getWebsiteSchema,
+  getBreadcrumbSchema,
+  getProjectSchema,
+  getPropertySchema,
+  getServicesCatalogSchema,
+} from "@/lib/seo/schema";
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
 import { metadata as rootMetadata } from "@/app/layout";
+import { metadata as homeMetadata } from "@/app/(public)/page";
 import { metadata as aboutMetadata } from "@/app/(public)/about/page";
 import { metadata as servicesMetadata } from "@/app/(public)/services/page";
 import { metadata as projectsMetadata } from "@/app/(public)/projects/page";
@@ -89,17 +97,107 @@ describe("SEO Suite - Technical, Structured Data & Metadata Integrity", () => {
         item: `${SITE_URL}/services`,
       });
     });
+
+    it("generates valid CreativeWork and ConstructionProject schema for projects", () => {
+      const mockProject = {
+        title: "Ibadan Foundation Project",
+        slug: "ibadan-foundation-project",
+        short_description: "Active residential construction in Ibadan.",
+        cover_image_path: "https://example.com/cover.jpg",
+        location: "Ibadan, Oyo State",
+        project_type: "Residential",
+        created_at: "2026-10-10T12:00:00Z",
+        updated_at: "2026-10-11T12:00:00Z",
+      };
+
+      const mockVideos = [
+        {
+          title: "Foundation Excavation Tour",
+          caption: "Straight trench excavation",
+          created_at: "2026-10-10T12:00:00Z",
+          duration_seconds: 45,
+          thumbnail_path: "https://example.com/thumb.jpg",
+        },
+      ];
+
+      const schema = getProjectSchema(mockProject, [], mockVideos);
+      expect(schema["@context"]).toBe("https://schema.org");
+      expect(schema["@type"]).toContain("CreativeWork");
+      expect(schema.name).toBe("Ibadan Foundation Project");
+      expect(schema.url).toBe(`${SITE_URL}/projects/ibadan-foundation-project`);
+      expect(schema.creator).toEqual({ "@id": `${SITE_URL}/#organization` });
+      expect(schema.locationCreated).toMatchObject({
+        "@type": "Place",
+        name: "Ibadan, Oyo State",
+      });
+
+      // Video verification
+      expect(schema.video).toBeDefined();
+      expect(schema.video?.[0]).toMatchObject({
+        "@type": "VideoObject",
+        name: "Foundation Excavation Tour",
+        duration: "PT45S",
+      });
+    });
+
+    it("generates valid RealEstateListing schema for properties", () => {
+      const mockProperty = {
+        title: "Executive 4 Bedroom Duplex",
+        slug: "executive-4-bedroom-duplex",
+        description: "Registered survey, pristine location.",
+        location: "Ibadan, Oyo State",
+        property_type: "Duplex",
+        status: "Available",
+        price: 85000000,
+        bedrooms: 4,
+        bathrooms: 5,
+        size_sqm: 450,
+        created_at: "2026-10-10T12:00:00Z",
+        updated_at: "2026-10-11T12:00:00Z",
+      };
+
+      const schema = getPropertySchema(mockProperty, [{ storage_path: "https://example.com/prop.jpg", is_primary: true }]);
+      expect(schema["@context"]).toBe("https://schema.org");
+      expect(schema["@type"]).toContain("RealEstateListing");
+      expect(schema.price).toBe(85000000);
+      expect(schema.priceCurrency).toBe("NGN");
+      expect(schema.availability).toBe("https://schema.org/InStock");
+      expect(schema.itemOffered).toMatchObject({
+        "@type": "SingleFamilyResidence",
+        numberOfBedrooms: 4,
+        numberOfBathroomsTotal: 5,
+      });
+    });
+
+    it("generates valid Service catalog schema for services", () => {
+      const schema = getServicesCatalogSchema();
+      expect(schema["@context"]).toBe("https://schema.org");
+      expect(schema["@type"]).toBe("Service");
+      expect(schema.provider).toEqual({ "@id": `${SITE_URL}/#organization` });
+      expect(schema.hasOfferCatalog.itemListElement.length).toBeGreaterThanOrEqual(4);
+    });
   });
 
   describe("2. Robots.txt Directives", () => {
     it("allows public crawling while disallowing admin and api paths", () => {
       const robotsConfig = robots();
-      const rules = Array.isArray(robotsConfig.rules) ? robotsConfig.rules[0] : robotsConfig.rules;
-      expect(rules).toBeDefined();
-      expect(rules?.allow).toBe("/");
-      expect(rules?.disallow).toContain("/admin/");
-      expect(rules?.disallow).toContain("/api/");
+      const rules = Array.isArray(robotsConfig.rules) ? robotsConfig.rules : [robotsConfig.rules];
+      const defaultRule = rules.find((r) => r.userAgent === "*");
+      expect(defaultRule).toBeDefined();
+      expect(defaultRule?.allow).toBe("/");
+      expect(defaultRule?.disallow).toContain("/admin/");
+      expect(defaultRule?.disallow).toContain("/api/");
       expect(robotsConfig.sitemap).toBe(`${SITE_URL}/sitemap.xml`);
+    });
+
+    it("explicitly includes rules for AI crawlers and Answer Engines", () => {
+      const robotsConfig = robots();
+      const rules = Array.isArray(robotsConfig.rules) ? robotsConfig.rules : [robotsConfig.rules];
+      const aiRule = rules.find((r) => Array.isArray(r.userAgent) && r.userAgent.includes("GPTBot"));
+      expect(aiRule).toBeDefined();
+      expect(aiRule?.allow).toBe("/");
+      expect(aiRule?.disallow).toContain("/admin/");
+      expect(aiRule?.disallow).toContain("/api/");
     });
   });
 
@@ -186,6 +284,12 @@ describe("SEO Suite - Technical, Structured Data & Metadata Integrity", () => {
       );
       expect(propertiesMetadata.alternates?.canonical).toBe("/properties");
 
+      // Home Page
+      expect((homeMetadata.title as { absolute: string }).absolute).toBe(
+        `Building Construction Company in Ibadan | ${COMPANY_INFO.shortName}`
+      );
+      expect(homeMetadata.alternates?.canonical).toBe("/");
+
       // Privacy Page
       expect((privacyMetadata.title as { absolute: string }).absolute).toBe(
         "Privacy Policy | POAB Global Construction"
@@ -195,6 +299,7 @@ describe("SEO Suite - Technical, Structured Data & Metadata Integrity", () => {
 
     it("ensures no metadata description contains em dashes", () => {
       const descriptions = [
+        homeMetadata.description,
         aboutMetadata.description,
         servicesMetadata.description,
         projectsMetadata.description,

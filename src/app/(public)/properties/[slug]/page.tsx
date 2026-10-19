@@ -12,7 +12,7 @@ import { formatPrice, buildWhatsAppLink } from "@/lib/utils";
 import { PropertyEnquiryForm } from "@/components/properties/PropertyEnquiryForm";
 import { getPublicContactSettings } from "@/lib/contact-settings";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getBreadcrumbSchema } from "@/lib/seo/schema";
+import { getBreadcrumbSchema, getPropertySchema } from "@/lib/seo/schema";
 import { DirectVideoPlayer } from "@/components/media/DirectVideoPlayer";
 
 interface PropertyDetailPageProps {
@@ -175,6 +175,8 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
     { name: property.title, path: `/properties/${property.slug}` },
   ]);
 
+  const propertySchema = getPropertySchema(property, images, videos);
+
   const isSold = property.status === "Sold";
   const isWithdrawn = property.status === "Withdrawn";
   const primaryImage =
@@ -188,6 +190,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
   return (
     <div className="bg-white min-h-screen">
       <JsonLd data={breadcrumbs} />
+      <JsonLd data={propertySchema} />
       {/* Breadcrumb Bar */}
       <div className="bg-poab-stone-light border-b border-poab-grey-border py-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-xs text-poab-charcoal/70 flex items-center space-x-2">
